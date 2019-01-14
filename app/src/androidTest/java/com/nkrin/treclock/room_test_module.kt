@@ -2,6 +2,7 @@ package com.nkrin.treclock
 
 import android.arch.persistence.room.Room
 import com.nkrin.treclock.data.room.ScheduleDatabase
+import com.nkrin.treclock.domain.repository.ScheduleRepositoryRoomImpl
 import org.koin.dsl.module.module
 
 val roomTestModule = module(override = true) {
@@ -9,5 +10,9 @@ val roomTestModule = module(override = true) {
         Room.inMemoryDatabaseBuilder(get(), ScheduleDatabase::class.java)
             .allowMainThreadQueries()
             .build()
+    }
+
+    single {
+        ScheduleRepositoryRoomImpl(get())
     }
 }
