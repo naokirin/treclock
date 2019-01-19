@@ -1,14 +1,22 @@
 package com.nkrin.treclock.view.splash
 
 import android.arch.lifecycle.Observer
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.design.widget.Snackbar
+import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.view.animation.AnimationUtils
+import android.widget.ImageView
 import com.nkrin.treclock.R
-import com.nkrin.treclock.util.mvvm.*
+import com.nkrin.treclock.util.mvvm.Error
+import com.nkrin.treclock.util.mvvm.Pending
+import com.nkrin.treclock.util.mvvm.Success
+import com.nkrin.treclock.view.scheduler.SchedulerActivity
 import kotlinx.android.synthetic.main.activity_splash.*
+import org.jetbrains.anko.clearTask
+import org.jetbrains.anko.clearTop
+import org.jetbrains.anko.intentFor
+import org.jetbrains.anko.newTask
 import org.koin.android.viewmodel.ext.android.viewModel
 
 class SplashActivity : AppCompatActivity() {
@@ -29,6 +37,9 @@ class SplashActivity : AppCompatActivity() {
     }
 
     private fun showLoading() {
+        val background = findViewById<ImageView>(R.id.splash_back)
+        val id = resources.getIdentifier("splash_back${(1..9).random()}", "drawable", packageName)
+        background.setImageResource(id)
         val animation =
             AnimationUtils.loadAnimation(
                 applicationContext,

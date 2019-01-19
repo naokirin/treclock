@@ -14,7 +14,7 @@ class SplashViewModel(private val schedulable: Schedulable): BaseViewModel() {
 
     fun load() {
         launch {
-            Observable.timer(1, TimeUnit.SECONDS).observeOn(schedulable.ui())
+            Observable.timer(2400, TimeUnit.MILLISECONDS).observeOn(schedulable.ui())
                 .subscribe(
                     { _events.value = Success },
                     { error -> _events.value = Error(error) })
