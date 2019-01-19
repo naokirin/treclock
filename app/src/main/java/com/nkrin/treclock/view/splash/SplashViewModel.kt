@@ -2,11 +2,11 @@ package com.nkrin.treclock.view.splash
 
 import android.arch.lifecycle.LiveData
 import com.nkrin.treclock.util.mvvm.*
-import com.nkrin.treclock.util.rx.Schedulable
+import com.nkrin.treclock.util.rx.SchedulerProvider
 import io.reactivex.Observable
 import java.util.concurrent.TimeUnit
 
-class SplashViewModel(private val schedulable: Schedulable): BaseViewModel() {
+class SplashViewModel(private val schedulerProvider: SchedulerProvider): BaseViewModel() {
 
     private val _events = SingleLiveEvent<ViewModelEvent>()
     val events: LiveData<ViewModelEvent>
@@ -14,9 +14,9 @@ class SplashViewModel(private val schedulable: Schedulable): BaseViewModel() {
 
     fun load() {
         launch {
-            Observable.timer(2400, TimeUnit.MILLISECONDS).observeOn(schedulable.ui())
+            Observable.timer(2400, TimeUnit.MILLISECONDS).observeOn(schedulerProvider.ui())
                 .subscribe(
-                    { _events.value = Success },
+                    { _events.value = Success() },
                     { error -> _events.value = Error(error) })
         }
     }

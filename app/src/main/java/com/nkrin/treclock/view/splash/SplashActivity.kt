@@ -50,10 +50,8 @@ class SplashActivity : AppCompatActivity() {
     }
 
     private fun complete() {
-        splashIcon.visibility = View.GONE
-        //splashIconFail.visibility = View.VISIBLE
-        Snackbar.make(splash, "SplashActivity finished", Snackbar.LENGTH_INDEFINITE)
-            .show()
+        startActivity(intentFor<SchedulerActivity>().clearTop().clearTask().newTask())
+        overridePendingTransition(R.anim.activity_enter_anim, R.anim.activity_exit_anim)
     }
 
     private fun showError(error: Throwable) {

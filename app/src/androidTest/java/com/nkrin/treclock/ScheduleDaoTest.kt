@@ -95,6 +95,36 @@ class ScheduleDaoTest : KoinTest {
     }
 
     @Test
+    fun testDeleteSchedulesFromId() {
+        val entities = Factory.scheduleEntities()
+        val stepEntities = Factory.stepEntities()
+        scheduleDao.insertSchedules(entities)
+        scheduleDao.insertSteps(stepEntities)
+
+        scheduleDao.deleteSchedulesFromId(listOf(entities[0].id))
+
+        val requestedEntities = scheduleDao.loadScheduleAndSteps().blockingGet()
+
+        assertEquals(entities[1], requestedEntities[0].schedule)
+        assertTrue(requestedEntities[0].steps.isEmpty())
+    }
+
+    @Test
+    fun testDeleteStepsFromId() {
+        val entities = Factory.scheduleEntities()
+        val stepEntities = Factory.stepEntities()
+        scheduleDao.insertSchedules(entities)
+        scheduleDao.insertSteps(stepEntities)
+
+        scheduleDao.deleteStepsFromId(listOf(stepEntities[0].id))
+
+        val requestedEntities = scheduleDao.loadScheduleAndSteps().blockingGet()
+
+        assertEquals(entities, requestedEntities.map{ it.schedule })
+        assertEquals(listOf(stepEntities[1]), requestedEntities[0].steps)
+    }
+
+    @Test
     fun testUpdateSchedules() {
         val entities = Factory.scheduleEntities()
         val stepEntities = Factory.stepEntities()

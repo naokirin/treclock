@@ -2,43 +2,41 @@ package com.nkrin.treclock.util.rx
 
 import io.reactivex.Completable
 import io.reactivex.Single
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 
-fun Completable.fromIo(schedulable: Schedulable): Completable =
-    this.subscribeOn(schedulable.io())
+fun Completable.fromIo(schedulerProvider: SchedulerProvider): Completable =
+    this.subscribeOn(schedulerProvider.io())
 
-fun <T> Single<T>.fromIo(schedulable: Schedulable): Single<T> =
-    this.subscribeOn(schedulable.io())
+fun <T> Single<T>.fromIo(schedulerProvider: SchedulerProvider): Single<T> =
+    this.subscribeOn(schedulerProvider.io())
 
-fun Completable.toIo(schedulable: Schedulable): Completable =
-    this.observeOn(schedulable.io())
+fun Completable.toIo(schedulerProvider: SchedulerProvider): Completable =
+    this.observeOn(schedulerProvider.io())
 
-fun <T> Single<T>.toIo(schedulable: Schedulable): Single<T> =
-    this.observeOn(schedulable.io())
+fun <T> Single<T>.toIo(schedulerProvider: SchedulerProvider): Single<T> =
+    this.observeOn(schedulerProvider.io())
 
 
-fun Completable.fromUi(schedulable: Schedulable): Completable =
-    this.subscribeOn(schedulable.ui())
+fun Completable.fromUi(schedulerProvider: SchedulerProvider): Completable =
+    this.subscribeOn(schedulerProvider.ui())
 
-fun <T> Single<T>.fromUi(schedulable: Schedulable): Single<T> =
-    this.subscribeOn(schedulable.ui())
+fun <T> Single<T>.fromUi(schedulerProvider: SchedulerProvider): Single<T> =
+    this.subscribeOn(schedulerProvider.ui())
 
-fun Completable.toUi(schedulable: Schedulable): Completable =
-    this.observeOn(schedulable.ui())
+fun Completable.toUi(schedulerProvider: SchedulerProvider): Completable =
+    this.observeOn(schedulerProvider.ui())
 
-fun <T> Single<T>.toUi(schedulable: Schedulable): Single<T> =
-    this.observeOn(schedulable.ui())
+fun <T> Single<T>.toUi(schedulerProvider: SchedulerProvider): Single<T> =
+    this.observeOn(schedulerProvider.ui())
 
 
-fun Completable.fromComputation(schedulable: Schedulable): Completable =
-    this.subscribeOn(schedulable.computation())
+fun Completable.fromComputation(schedulerProvider: SchedulerProvider): Completable =
+    this.subscribeOn(schedulerProvider.computation())
 
-fun <T> Single<T>.fromComputation(schedulable: Schedulable): Single<T> =
-    this.subscribeOn(schedulable.computation())
+fun <T> Single<T>.fromComputation(schedulerProvider: SchedulerProvider): Single<T> =
+    this.subscribeOn(schedulerProvider.computation())
 
-fun Completable.toComputation(schedulable: Schedulable): Completable =
-    this.observeOn(schedulable.computation())
+fun Completable.toComputation(schedulerProvider: SchedulerProvider): Completable =
+    this.observeOn(schedulerProvider.computation())
 
-fun <T> Single<T>.toComputation(schedulable: Schedulable): Single<T> =
-    this.observeOn(schedulable.computation())
+fun <T> Single<T>.toComputation(schedulerProvider: SchedulerProvider): Single<T> =
+    this.observeOn(schedulerProvider.computation())

@@ -2,7 +2,6 @@ package com.nkrin.treclock.data.room
 
 import android.arch.persistence.room.*
 import io.reactivex.Single
-import android.provider.SyncStateContract.Helpers.update
 import android.database.sqlite.SQLiteConstraintException
 
 
@@ -21,6 +20,12 @@ abstract class ScheduleDao {
 
     @Delete
     abstract fun deleteSteps(steps: List<StepEntity>)
+
+    @Query("DELETE FROM schedules WHERE id IN(:scheduleIds)")
+    abstract fun deleteSchedulesFromId(scheduleIds: List<Int>)
+
+    @Query("DELETE FROM steps WHERE id IN(:stepIds)")
+    abstract fun deleteStepsFromId(stepIds: List<Int>)
 
     @Update(onConflict = OnConflictStrategy.FAIL)
     abstract fun updateSchedules(schedules: List<ScheduleEntity>)

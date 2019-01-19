@@ -11,9 +11,9 @@ open class ViewModelEvent
 object Pending : ViewModelEvent()
 
 /**
- * Generic Success Event
+ * Having Value Success Event
  */
-object Success : ViewModelEvent()
+class Success(val value: Any? = null) : ViewModelEvent()
 
 /**
  * Generic Failed Event

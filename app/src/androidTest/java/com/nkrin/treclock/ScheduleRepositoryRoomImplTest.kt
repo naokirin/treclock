@@ -46,6 +46,19 @@ class ScheduleRepositoryRoomImplTest : KoinTest {
         assertEquals(schedules, scheduleRepositoryRoomImpl.getSchedules().blockingGet())
     }
 
+    @Test
+    fun testDelete() {
+        val schedules = Factory.schedules()
+
+        assertTrue(scheduleRepositoryRoomImpl.getSchedules().blockingGet().isEmpty())
+
+        scheduleRepositoryRoomImpl.storeSchedules(schedules)
+
+        val schedulesAfterDeleted = Factory.schedulesAfterDeleted()
+        scheduleRepositoryRoomImpl.storeSchedules(schedulesAfterDeleted)
+
+        assertEquals(schedulesAfterDeleted, scheduleRepositoryRoomImpl.getSchedules().blockingGet())
+    }
 
     object Factory {
         fun schedules(): List<Schedule> {
@@ -56,5 +69,9 @@ class ScheduleRepositoryRoomImplTest : KoinTest {
                 Schedule(2, "test2", "comment2",
                     listOf(Step(2, 2, "", now, now, null, null)))
             )
+        }
+
+        fun schedulesAfterDeleted(): List<Schedule> {
+            return listOf(Schedule(1, "test1", "comment1", listOf()))
         }
     }}

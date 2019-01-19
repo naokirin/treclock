@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">Treclock</string>
     <string name="splashText">Treclock</string>
+    <string name="title_activity_scheduler">Schedules</string>
+    <string name="action_settings">Settings</string>
+    <string name="schedule_title">スケジュール名</string>
 </resources>

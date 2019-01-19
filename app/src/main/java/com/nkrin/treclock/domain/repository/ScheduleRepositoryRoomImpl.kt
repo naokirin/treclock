@@ -15,5 +15,12 @@ class ScheduleRepositoryRoomImpl(private val scheduleDao: ScheduleDao) : Schedul
         val scheduleAndStepsList = schedules.map { ScheduleAndSteps.from(it) }
         scheduleDao.upsertSchedules(scheduleAndStepsList.map { it.schedule })
         scheduleDao.upsertSteps(scheduleAndStepsList.flatMap { it.steps })
+
+        val storedSchedules = getSchedules().blockingGet()
+        val deletedScheduleIds = storedSchedules.map { it.id }.subtract(schedules.map { it.id }).toList()
+        scheduleDao.deleteSchedulesFromId(deletedScheduleIds)
+        val deletedStepIds = storedSchedules.flatMap { it.steps }.map { it.id }
+            .subtract(schedules.flatMap { it.steps }.map { it.id }).toList()
+        scheduleDao.deleteStepsFromId(deletedStepIds)
     }
 }
