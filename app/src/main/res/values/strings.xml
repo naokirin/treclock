@@ -4,6 +4,8 @@
     <string name="title_activity_scheduler">Schedules</string>
     <string name="action_settings">Settings</string>
     <string name="schedule_title">スケジュール名</string>
+    <string name="schedule_dialog_title">スケジュール名</string>
+    <string name="schedule_dialog_comment">コメント</string>
     <string name="title_activity_detail">DetailActivity</string>
 
     <!-- TODO: Remove or change this placeholder text -->
