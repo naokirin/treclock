@@ -1,4 +1,4 @@
-package com.nkrin.treclock.view.scheduler
+package com.nkrin.treclock.view.util
 
 import android.graphics.Rect
 import android.support.v7.widget.RecyclerView

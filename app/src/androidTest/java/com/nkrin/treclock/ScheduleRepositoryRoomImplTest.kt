@@ -1,7 +1,6 @@
 package com.nkrin.treclock
 
 import android.support.test.runner.AndroidJUnit4
-import com.nkrin.treclock.data.room.ScheduleDao
 import com.nkrin.treclock.data.room.ScheduleDatabase
 import com.nkrin.treclock.domain.entity.Schedule
 import com.nkrin.treclock.domain.entity.Step
@@ -16,7 +15,7 @@ import org.koin.standalone.StandAloneContext.loadKoinModules
 import org.koin.standalone.StandAloneContext.stopKoin
 import org.koin.standalone.inject
 import org.koin.test.KoinTest
-import java.time.OffsetDateTime
+import java.time.Duration
 
 @RunWith(AndroidJUnit4::class)
 class ScheduleRepositoryRoomImplTest : KoinTest {
@@ -41,7 +40,7 @@ class ScheduleRepositoryRoomImplTest : KoinTest {
 
         assertTrue(scheduleRepositoryRoomImpl.getSchedules().blockingGet().isEmpty())
 
-        scheduleRepositoryRoomImpl.storeSchedules(schedules)
+        scheduleRepositoryRoomImpl.storeSchedules(schedules).blockingGet()
 
         assertEquals(schedules, scheduleRepositoryRoomImpl.getSchedules().blockingGet())
     }
@@ -52,26 +51,34 @@ class ScheduleRepositoryRoomImplTest : KoinTest {
 
         assertTrue(scheduleRepositoryRoomImpl.getSchedules().blockingGet().isEmpty())
 
-        scheduleRepositoryRoomImpl.storeSchedules(schedules)
+        scheduleRepositoryRoomImpl.storeSchedules(schedules).blockingGet()
 
         val schedulesAfterDeleted = Factory.schedulesAfterDeleted()
-        scheduleRepositoryRoomImpl.storeSchedules(schedulesAfterDeleted)
+        scheduleRepositoryRoomImpl.storeSchedules(schedulesAfterDeleted).blockingGet()
 
         assertEquals(schedulesAfterDeleted, scheduleRepositoryRoomImpl.getSchedules().blockingGet())
     }
 
+    @Test
+    fun testStoreSchedule() {
+        val schedules = Factory.schedules()
+
+        scheduleRepositoryRoomImpl.storeSchedule(schedules[0]).blockingGet()
+
+        assertEquals(schedules[0], scheduleRepositoryRoomImpl.getSchedules().blockingGet()[0])
+    }
+
     object Factory {
         fun schedules(): List<Schedule> {
-            val now = OffsetDateTime.now()
             return listOf(
                 Schedule(1, "test1", "comment1",
-                    listOf(Step(1, 1, "", now, now, null, null))),
+                    mutableListOf(Step(1, 1, 0, "", Duration.ofMinutes(10L), null, null))),
                 Schedule(2, "test2", "comment2",
-                    listOf(Step(2, 2, "", now, now, null, null)))
+                    mutableListOf(Step(2, 2, 0, "", Duration.ofMinutes(10L), null, null)))
             )
         }
 
         fun schedulesAfterDeleted(): List<Schedule> {
-            return listOf(Schedule(1, "test1", "comment1", listOf()))
+            return listOf(Schedule(1, "test1", "comment1", mutableListOf()))
         }
     }}

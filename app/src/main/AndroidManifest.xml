@@ -22,6 +22,12 @@
                 android:label="@string/title_activity_scheduler"
                 android:theme="@style/AppTheme">
         </activity>
+        <activity
+                android:name=".view.detail.DetailActivity"
+                android:label="@string/title_activity_detail"
+                android:theme="@style/AppTheme"
+                android:parentActivityName=".view.scheduler.SchedulerActivity">
+        </activity>
     </application>
 
 </manifest>

@@ -1,6 +1,7 @@
 package com.nkrin.treclock.data.room
 
 import android.arch.persistence.room.TypeConverter
+import java.time.Duration
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 
@@ -17,5 +18,15 @@ class Converters {
     @TypeConverter
     fun fromOffsetDateTime(date: OffsetDateTime?): String? {
         return date?.format(formatter)
+    }
+
+    @TypeConverter
+    fun toDuration(value: Long): Duration {
+        return Duration.ofMinutes(value)
+    }
+
+    @TypeConverter
+    fun fromDuration(duration: Duration): Long {
+        return duration.toMinutes()
     }
 }

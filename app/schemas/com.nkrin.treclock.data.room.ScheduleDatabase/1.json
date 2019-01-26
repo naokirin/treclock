@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "ba2efef6917ef321a98cb703f065fe37",
+    "identityHash": "ab673189e347df7268d7a74b367f7744",
     "entities": [
       {
         "tableName": "schedules",
@@ -38,7 +38,7 @@
       },
       {
         "tableName": "steps",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `scheduleId` INTEGER NOT NULL, `title` TEXT NOT NULL, `start` TEXT, `end` TEXT, `actualStart` TEXT, `actualEnd` TEXT, FOREIGN KEY(`scheduleId`) REFERENCES `schedules`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `scheduleId` INTEGER NOT NULL, `order` INTEGER NOT NULL, `title` TEXT NOT NULL, `duration` INTEGER NOT NULL, `actualStart` TEXT, `actualEnd` TEXT, FOREIGN KEY(`scheduleId`) REFERENCES `schedules`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -53,22 +53,22 @@
             "notNull": true
           },
           {
+            "fieldPath": "order",
+            "columnName": "order",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
             "fieldPath": "title",
             "columnName": "title",
             "affinity": "TEXT",
             "notNull": true
           },
           {
-            "fieldPath": "start",
-            "columnName": "start",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
-            "fieldPath": "end",
-            "columnName": "end",
-            "affinity": "TEXT",
-            "notNull": false
+            "fieldPath": "duration",
+            "columnName": "duration",
+            "affinity": "INTEGER",
+            "notNull": true
           },
           {
             "fieldPath": "actualStart",
@@ -116,7 +116,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"ba2efef6917ef321a98cb703f065fe37\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"ab673189e347df7268d7a74b367f7744\")"
     ]
   }
 }

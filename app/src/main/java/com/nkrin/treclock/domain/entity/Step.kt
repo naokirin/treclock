@@ -1,13 +1,14 @@
 package com.nkrin.treclock.domain.entity
 
+import java.time.Duration
 import java.time.OffsetDateTime
 
 data class Step(
     var id: Int,
     var scheduleId: Int,
+    var order: Int,
     var title: String,
-    var start: OffsetDateTime? = null,
-    var end: OffsetDateTime? = null,
+    var duration: Duration,
     val actualStart: OffsetDateTime? = null,
     val actualEnd: OffsetDateTime? = null
 )

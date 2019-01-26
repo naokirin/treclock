@@ -13,6 +13,7 @@ import org.koin.standalone.StandAloneContext.loadKoinModules
 import org.koin.standalone.StandAloneContext.stopKoin
 import org.koin.standalone.inject
 import org.koin.test.KoinTest
+import java.time.Duration
 import java.time.OffsetDateTime
 
 @RunWith(AndroidJUnit4::class)
@@ -53,7 +54,7 @@ class ScheduleDaoTest : KoinTest {
         )
 
         val stepEntities = listOf(
-            StepEntity(1, 1, "step1", OffsetDateTime.now(), OffsetDateTime.now())
+            StepEntity(1, 1, 1, "step1", Duration.ofMinutes(10))
         )
 
         scheduleDao.insertSchedules(entities)
@@ -206,8 +207,8 @@ class ScheduleDaoTest : KoinTest {
 
         fun stepEntities(): List<StepEntity> {
             return listOf(
-                StepEntity(1, 1, "step1", OffsetDateTime.now(), OffsetDateTime.now()) ,
-                StepEntity(2, 1, "step2", OffsetDateTime.now(), OffsetDateTime.now())
+                StepEntity(1, 1, 1, "step1", Duration.ofMinutes(10)),
+                StepEntity(2, 1, 1, "step2", Duration.ofMinutes(10))
             )
         }
     }

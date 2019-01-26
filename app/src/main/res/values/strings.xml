@@ -4,4 +4,13 @@
     <string name="title_activity_scheduler">Schedules</string>
     <string name="action_settings">Settings</string>
     <string name="schedule_title">スケジュール名</string>
+    <string name="title_activity_detail">DetailActivity</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="scheduler_dialog_comment">コメント</string>
+    <string name="menu_detail_edit">編集</string>
+    <string name="menu_detail_delete">削除</string>
+    <string name="step_dialog_title">ステップ名</string>
+    <string name="step_dialog_duration_minutes">時間（分）</string>
 </resources>

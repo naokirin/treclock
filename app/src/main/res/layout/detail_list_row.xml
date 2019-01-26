@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
               android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
-              android:paddingBottom="4dp"
-              android:paddingTop="4dp">
-
+              android:paddingBottom="4dp" android:paddingTop="4dp">
     <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
@@ -28,30 +26,31 @@
                 app:layout_constraintStart_toEndOf="@+id/imageView" android:layout_marginStart="8dp"
                 android:id="@+id/linearLayout"
                 android:layout_width="0dp" app:layout_constraintEnd_toStartOf="@+id/removing_button"
-                android:layout_marginEnd="116dp">
+                android:layout_marginEnd="116dp" android:paddingRight="8dp">
 
             <TextView
                     android:id="@+id/title"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="0.5" android:text="title"
-                    android:textSize="24sp"
-                    android:ellipsize="end"
-                    android:singleLine="true"/>
+                    android:textSize="24sp"/>
+            <View
+                    android:layout_width="match_parent"
+                    android:id="@+id/view" android:layout_weight="0.5" android:layout_height="1dp"
+                    android:background="@android:color/darker_gray"/>
             <TextView
-                    android:id="@+id/detail"
+                    android:id="@+id/duration"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:layout_weight="0.5" android:text="detail"
-                    android:textAppearance="@style/TextAppearance.AppCompat" android:textSize="18sp"
-                    android:ellipsize="end"
-                    android:singleLine="true"/>
+                    android:layout_weight="0.5" android:text="00分"
+                    android:textAppearance="@style/TextAppearance.AppCompat" android:textSize="18sp"/>
 
         </LinearLayout>
         <android.support.design.widget.FloatingActionButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:clickable="true" app:srcCompat="@android:drawable/ic_delete"
+                android:clickable="true"
+                app:srcCompat="@android:drawable/ic_delete"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"

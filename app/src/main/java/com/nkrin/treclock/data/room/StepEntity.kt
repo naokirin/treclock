@@ -5,6 +5,7 @@ import android.arch.persistence.room.ForeignKey
 import android.arch.persistence.room.Index
 import android.arch.persistence.room.PrimaryKey
 import com.nkrin.treclock.domain.entity.Step
+import java.time.Duration
 import java.time.OffsetDateTime
 
 @Entity(
@@ -21,19 +22,19 @@ data class StepEntity(
     @PrimaryKey(autoGenerate = true)
     var id: Int,
     var scheduleId: Int,
+    var order: Int,
     var title: String,
-    var start: OffsetDateTime? = null,
-    var end: OffsetDateTime? = null,
+    var duration: Duration,
     val actualStart: OffsetDateTime? = null,
     val actualEnd: OffsetDateTime? = null
 ) {
     fun to(): Step {
-        return Step(this.id, this.scheduleId, this.title, this.start, this.end, this.actualStart, this.actualEnd)
+        return Step(this.id, this.scheduleId, this.order, this.title, this.duration, this.actualStart, this.actualEnd)
     }
 
     companion object {
         fun from(step: Step): StepEntity {
-            return StepEntity(step.id, step.scheduleId, step.title, step.start, step.end, step.actualStart, step.actualEnd)
+            return StepEntity(step.id, step.scheduleId, step.order, step.title, step.duration, step.actualStart, step.actualEnd)
         }
     }
 }

@@ -13,16 +13,16 @@ class ScheduleAndSteps {
 
     fun to(): Schedule {
         val schedule = schedule
-        val steps = steps
-        return Schedule(schedule.id, schedule.name, schedule.comment, steps.map { it.to() })
+        val steps = steps.sortedBy { it.order }
+        return Schedule(schedule.id, schedule.name, schedule.comment, steps.map { it.to() }.toMutableList())
     }
 
     companion object {
         fun from(schedule: Schedule): ScheduleAndSteps {
             val scheduleEntity = ScheduleEntity(schedule.id, schedule.name, schedule.comment)
 
-            val stepEntities = schedule.steps.map {
-                StepEntity(it.id, it.scheduleId, it.title, it.start, it.end, it.actualStart, it.actualEnd)
+            val stepEntities = schedule.steps.mapIndexed { index, step ->
+                StepEntity(step.id, step.scheduleId, index, step.title, step.duration, step.actualStart, step.actualEnd)
             }
 
             return ScheduleAndSteps().also {

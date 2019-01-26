@@ -50,9 +50,9 @@ class SchedulerViewModel(
         val index = 0
         val lastIdSchedule = list.maxBy { it.id }
         val id = if (lastIdSchedule == null) 1 else lastIdSchedule.id + 1
-        list.add(index, Schedule(id, title, comment, listOf()))
+        list.add(index, Schedule(id, title, comment, mutableListOf()))
         launch {
-            Completable.fromAction { schedulerRepository.storeSchedules(list) }
+            schedulerRepository.storeSchedules(list)
                 .fromIo(schedulerProvider).toUi(schedulerProvider)
                 .subscribe(
                     { _addingEvents.value = Success(index) },
@@ -72,7 +72,7 @@ class SchedulerViewModel(
         if (index != -1) {
             val item = list.removeAt(index)
             launch {
-                Completable.fromAction { schedulerRepository.storeSchedules(list) }
+                schedulerRepository.storeSchedules(list)
                     .fromIo(schedulerProvider).toUi(schedulerProvider)
                     .subscribe(
                         { _removingEvents.value = Success(index) },

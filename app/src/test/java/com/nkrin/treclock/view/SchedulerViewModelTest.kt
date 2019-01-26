@@ -9,6 +9,7 @@ import com.nkrin.treclock.util.capture
 import com.nkrin.treclock.util.mvvm.*
 import com.nkrin.treclock.util.mvvm.ViewModelEvent
 import com.nkrin.treclock.view.scheduler.SchedulerViewModel
+import io.reactivex.Completable
 import io.reactivex.Single
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -16,12 +17,9 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.koin.test.KoinTest
-import org.mockito.ArgumentCaptor
+import org.mockito.*
 import org.mockito.BDDMockito.given
-import org.mockito.Captor
-import org.mockito.Mock
 import org.mockito.Mockito.*
-import org.mockito.MockitoAnnotations
 
 class SchedulerViewModelTest: KoinTest {
     lateinit var viewModel: SchedulerViewModel
@@ -41,6 +39,8 @@ class SchedulerViewModelTest: KoinTest {
     @Before
     fun before() {
         MockitoAnnotations.initMocks(this)
+
+        given(repository.storeSchedules(com.nkrin.treclock.util.any())).willReturn(Completable.complete())
 
         viewModel = SchedulerViewModel(TestSchedulerProvider, repository)
 

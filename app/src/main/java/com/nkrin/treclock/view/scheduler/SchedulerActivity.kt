@@ -13,9 +13,12 @@ import com.nkrin.treclock.domain.entity.Schedule
 import com.nkrin.treclock.util.mvvm.Error
 import com.nkrin.treclock.util.mvvm.Pending
 import com.nkrin.treclock.util.mvvm.Success
+import com.nkrin.treclock.view.detail.DetailActivity
 import com.nkrin.treclock.view.scheduler.dialog.NewScheduleDialogFragment
+import com.nkrin.treclock.view.util.BackgroundItemDecoration
 import com.nkrin.treclock.view.util.ProgressDialogFragment
 import kotlinx.android.synthetic.main.activity_scheduler.*
+import org.jetbrains.anko.intentFor
 import org.koin.android.viewmodel.ext.android.viewModel
 
 class SchedulerActivity : AppCompatActivity(), NewScheduleDialogFragment.Listener {
@@ -33,7 +36,11 @@ class SchedulerActivity : AppCompatActivity(), NewScheduleDialogFragment.Listene
 
         schedulerList = findViewById(R.id.scheduler_list)
         schedulerList.addItemDecoration(
-            BackgroundItemDecoration(R.drawable.item_grey_background, R.drawable.item_white_background))
+            BackgroundItemDecoration(
+                R.drawable.item_grey_background,
+                R.drawable.item_white_background
+            )
+        )
 
         schedulerViewModel.loadingEvents.observe(this, Observer {
             when(it) {
@@ -47,8 +54,8 @@ class SchedulerActivity : AppCompatActivity(), NewScheduleDialogFragment.Listene
 
         schedulerViewModel.addingEvents.observe(this, Observer {
             when(it) {
-                is Success -> onAdding(it.value)
-                is Error -> onAddingError()
+                is Success -> onAdded(it.value)
+                is Error -> onAddedError()
             }
 
             if (it !is Pending) {
@@ -58,14 +65,17 @@ class SchedulerActivity : AppCompatActivity(), NewScheduleDialogFragment.Listene
 
         schedulerViewModel.removingEvents.observe(this, Observer {
             when(it) {
-                is Success -> onRemoving(it.value)
-                is Error -> onRemovingError()
+                is Success -> onRemoved(it.value)
+                is Error -> onRemovedError()
             }
             if (it !is Pending) {
                 progressDialog?.cancel()
             }
         })
+    }
 
+    override fun onResume() {
+        super.onResume()
         progressDialog = ProgressDialogFragment.create("Loading...")
         progressDialog?.show(supportFragmentManager, null)
         schedulerViewModel.load()
@@ -77,14 +87,12 @@ class SchedulerActivity : AppCompatActivity(), NewScheduleDialogFragment.Listene
                 .show()
         } else {
             addNewSchedule(title, comment)
-            Toast.makeText(this , "スケジュールを追加しました", Toast.LENGTH_SHORT)
-                .show()
         }
     }
 
-    fun openDetail(tappedView: View, schedule: Schedule) {
-        Snackbar.make(tappedView, "${schedule.name}", Snackbar.LENGTH_LONG)
-            .setAction("Action", null).show()
+    fun openDetail(schedule: Schedule) {
+        overridePendingTransition(R.anim.child_activity_enter_anim, R.anim.child_activity_exit_anim)
+        startActivity(intentFor<DetailActivity>().putExtra("schedule_id", schedule.id))
     }
 
     private fun addNewSchedule(title: String, comment: String) {
@@ -96,7 +104,7 @@ class SchedulerActivity : AppCompatActivity(), NewScheduleDialogFragment.Listene
         }
     }
 
-    private fun deleteSchedule(id: Int) {
+    private fun removeSchedule(id: Int) {
         val adapter = schedulerList.adapter
         if (adapter is SchedulerRecycleViewAdapter) {
             schedulerViewModel.removeSchedule(id)
@@ -110,14 +118,12 @@ class SchedulerActivity : AppCompatActivity(), NewScheduleDialogFragment.Listene
             schedulerViewModel,
             object : SchedulerRecycleViewAdapter.RowListener {
                 override fun onClickRow(tappedView: View, schedule: Schedule) {
-                    this@SchedulerActivity.openDetail(tappedView, schedule)
+                    this@SchedulerActivity.openDetail(schedule)
                 }
             },
             object: SchedulerRecycleViewAdapter.RemovingListener {
                 override fun onClickRemoving(schedule: Schedule) {
-                    this@SchedulerActivity.deleteSchedule(schedule.id)
-                    Toast.makeText(this@SchedulerActivity, "スケジュールを削除しました", Toast.LENGTH_SHORT)
-                        .show()
+                    this@SchedulerActivity.removeSchedule(schedule.id)
                 }
             })
         val llm = LinearLayoutManager(this)
@@ -137,24 +143,32 @@ class SchedulerActivity : AppCompatActivity(), NewScheduleDialogFragment.Listene
             .setAction("OK") { schedulerViewModel.load() }.show()
     }
 
-    private fun onAdding(index: Any?) {
+    private fun onAdded(index: Any?) {
         if (index is Int) {
             schedulerList.adapter?.notifyItemInserted(index)
+            Toast.makeText(this , "スケジュールを追加しました", Toast.LENGTH_SHORT)
+                .show()
+        } else {
+            onAddedError()
         }
     }
 
-    private fun onAddingError() {
+    private fun onAddedError() {
          Snackbar.make(schedulerList, "追加できませんでした。", Snackbar.LENGTH_LONG)
             .setAction("OK") { schedulerViewModel.load() }.show()
     }
 
-    private fun onRemoving(index: Any?) {
+    private fun onRemoved(index: Any?) {
         if (index is Int) {
             schedulerList.adapter?.notifyItemRemoved(index)
+            Toast.makeText(this@SchedulerActivity, "スケジュールを削除しました", Toast.LENGTH_SHORT)
+                .show()
+        } else {
+            onRemovedError()
         }
     }
 
-    private fun onRemovingError() {
+    private fun onRemovedError() {
         Snackbar.make(schedulerList, "削除できませんでした。", Snackbar.LENGTH_LONG)
             .setAction("OK") { schedulerViewModel.load() }.show()
     }
