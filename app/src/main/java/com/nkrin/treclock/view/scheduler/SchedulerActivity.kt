@@ -14,7 +14,7 @@ import com.nkrin.treclock.util.mvvm.Error
 import com.nkrin.treclock.util.mvvm.Pending
 import com.nkrin.treclock.util.mvvm.Success
 import com.nkrin.treclock.view.detail.DetailActivity
-import com.nkrin.treclock.view.scheduler.dialog.NewScheduleDialogFragment
+import com.nkrin.treclock.view.util.dialog.NewScheduleDialogFragment
 import com.nkrin.treclock.view.util.BackgroundItemDecoration
 import com.nkrin.treclock.view.util.ProgressDialogFragment
 import kotlinx.android.synthetic.main.activity_scheduler.*
@@ -81,7 +81,7 @@ class SchedulerActivity : AppCompatActivity(), NewScheduleDialogFragment.Listene
         schedulerViewModel.load()
     }
 
-    override fun onClickedPositive(title: String, comment: String) {
+    override fun onClickedScheduleDialogPositive(id: Int, title: String, comment: String) {
         if (title.isEmpty()) {
             Toast.makeText(this , "無名のスケジュールは作成できません", Toast.LENGTH_SHORT)
                 .show()
@@ -133,7 +133,7 @@ class SchedulerActivity : AppCompatActivity(), NewScheduleDialogFragment.Listene
         schedulerList.adapter = adapter
 
         scheduler_add.setOnClickListener {
-            val newScheduleDialog = NewScheduleDialogFragment()
+            val newScheduleDialog = NewScheduleDialogFragment.create(0, "", "")
             newScheduleDialog.show(supportFragmentManager, "NewScheduleDialog")
         }
     }

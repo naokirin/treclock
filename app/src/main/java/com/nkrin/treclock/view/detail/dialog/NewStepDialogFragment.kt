@@ -1,4 +1,4 @@
-package com.nkrin.treclock.view.scheduler.dialog
+package com.nkrin.treclock.view.util.dialog
 
 import android.app.AlertDialog
 import android.app.Dialog
@@ -47,13 +47,13 @@ class NewStepDialogFragment : DialogFragment() {
             val duration = Duration.ofMinutes(java.lang.Long.parseLong(durationTextView.text.toString()))
             val listener = activity
             if (listener is Listener) {
-                listener.onClickedDialogPositive(id, title, duration)
+                listener.onClickedStepDialogPositive(id, title, duration)
             }
         }
     }
 
     interface Listener {
-        fun onClickedDialogPositive(id: Int, title: String, duration: Duration)
+        fun onClickedStepDialogPositive(id: Int, title: String, duration: Duration)
     }
 
     companion object {

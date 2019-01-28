@@ -1,33 +1,37 @@
 package com.nkrin.treclock.view.detail
 
 import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModel
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.RecyclerView.ViewHolder
 import android.support.v7.widget.Toolbar
+import android.support.v7.widget.helper.ItemTouchHelper
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
+import com.nkrin.treclock.R
 import com.nkrin.treclock.domain.entity.Schedule
 import com.nkrin.treclock.domain.entity.Step
-import com.nkrin.treclock.util.mvvm.*
+import com.nkrin.treclock.util.mvvm.Error
+import com.nkrin.treclock.util.mvvm.Success
 import com.nkrin.treclock.view.scheduler.DetailRecycleViewAdapter
-import com.nkrin.treclock.view.scheduler.dialog.NewStepDialogFragment
 import com.nkrin.treclock.view.util.BackgroundItemDecoration
 import com.nkrin.treclock.view.util.ProgressDialogFragment
+import com.nkrin.treclock.view.util.dialog.NewScheduleDialogFragment
+import com.nkrin.treclock.view.util.dialog.NewStepDialogFragment
+import com.nkrin.treclock.view.util.dialog.YesNoDialogFragment
 import kotlinx.android.synthetic.main.activity_detail.*
 import kotlinx.android.synthetic.main.content_detail.*
 import org.koin.android.viewmodel.ext.android.viewModel
 import java.time.Duration
-import android.support.v7.widget.RecyclerView.ViewHolder
-import android.support.v7.widget.helper.ItemTouchHelper
-import com.nkrin.treclock.R
 
-class DetailActivity : AppCompatActivity(), NewStepDialogFragment.Listener {
+class DetailActivity :
+    AppCompatActivity(),
+    NewStepDialogFragment.Listener, NewScheduleDialogFragment.Listener, YesNoDialogFragment.Listener {
 
     private val detailViewModel: DetailViewModel by viewModel()
     private var progressDialog: ProgressDialogFragment? = null
@@ -76,6 +80,10 @@ class DetailActivity : AppCompatActivity(), NewStepDialogFragment.Listener {
                 is Error -> onUpdatedError()
             }
         })
+
+        detailViewModel.removingScheduleEvents.observe(this, Observer {
+            onRemovedSchedule()
+        })
     }
 
     override fun onResume() {
@@ -101,10 +109,27 @@ class DetailActivity : AppCompatActivity(), NewStepDialogFragment.Listener {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.menu_detail_edit -> {
-                return true
+                val schedule = detailViewModel.schedule
+                if (schedule != null) {
+                    val dialog = NewScheduleDialogFragment.create(schedule.id, schedule.name, schedule.comment)
+                    dialog.show(supportFragmentManager, null)
+                    return true
+                }
+                return false
             }
             R.id.menu_detail_delete -> {
-                return true
+                val schedule = detailViewModel.schedule
+                if (schedule != null) {
+                    val dialog = YesNoDialogFragment.create(
+                        "removing_schedule_dialog",
+                        "スケジュールを削除します",
+                        "はい",
+                        "いいえ"
+                    )
+                    dialog.show(supportFragmentManager, null)
+                    return true
+                }
+                return false
             }
             android.R.id.home -> {
                 finish()
@@ -114,7 +139,15 @@ class DetailActivity : AppCompatActivity(), NewStepDialogFragment.Listener {
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onClickedDialogPositive(id: Int, title: String, duration: Duration) {
+    override fun onClickedScheduleDialogPositive(id: Int, title: String, comment: String) {
+        if (title.isEmpty()) {
+            Toast.makeText(this , "スケジュールを無名にはできません", Toast.LENGTH_SHORT)
+                .show()
+        } else {
+            updateSchedule(title, comment)
+        }
+    }
+    override fun onClickedStepDialogPositive(id: Int, title: String, duration: Duration) {
         if (title.isEmpty()) {
             Toast.makeText(this , "無名のステップは作成できません", Toast.LENGTH_SHORT)
                 .show()
@@ -125,13 +158,27 @@ class DetailActivity : AppCompatActivity(), NewStepDialogFragment.Listener {
         }
     }
 
-    private fun addNewStep(title: String, duration: Duration) {
-        val adapter = detailList.adapter
-        if (adapter is DetailRecycleViewAdapter) {
-            detailViewModel.addStep(title, duration)
-            progressDialog = ProgressDialogFragment.create("Saving...")
+    override fun onClickedYesNoDialogNegative(dialogId: String) {
+    }
+
+    override fun onClickedYesNoDialogPositive(dialogId: String) {
+        if (dialogId == "removing_schedule_dialog") {
+            detailViewModel.removeSchedule()
+            progressDialog = ProgressDialogFragment.create("Deleting...")
             progressDialog?.show(supportFragmentManager, null)
         }
+    }
+
+    private fun updateSchedule(title: String, comment: String) {
+        detailViewModel.updateSchedule(title, comment)
+        progressDialog = ProgressDialogFragment.create("Saving...")
+        progressDialog?.show(supportFragmentManager, null)
+    }
+
+    private fun addNewStep(title: String, duration: Duration) {
+        detailViewModel.addStep(title, duration)
+        progressDialog = ProgressDialogFragment.create("Saving...")
+        progressDialog?.show(supportFragmentManager, null)
     }
 
     private fun updateStep(id: Int, title: String, duration: Duration) {
@@ -268,7 +315,12 @@ class DetailActivity : AppCompatActivity(), NewStepDialogFragment.Listener {
                     .show()
                 return
             }
-        }
+         } else if (index == null) {
+             progressDialog?.cancel()
+             Toast.makeText(this, "スケジュールを更新しました", Toast.LENGTH_SHORT)
+                 .show()
+             return
+         }
         onUpdatedError()
     }
 
@@ -276,5 +328,10 @@ class DetailActivity : AppCompatActivity(), NewStepDialogFragment.Listener {
         progressDialog?.cancel()
         Snackbar.make(detail_list, "ステップを更新できませんでした。", Snackbar.LENGTH_LONG)
             .setAction("OK") { detailViewModel.loadSchedule(scheduleId) }.show()
+    }
+
+    private fun onRemovedSchedule() {
+        progressDialog?.cancel()
+        finish()
     }
 }

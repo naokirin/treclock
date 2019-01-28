@@ -4,7 +4,7 @@
         xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:context=".view.scheduler.dialog.NewStepDialogFragment" android:id="@+id/fragment_new_step_dialog">
+        tools:context=".view.util.dialog.NewStepDialogFragment" android:id="@+id/fragment_new_step_dialog">
 
     <LinearLayout
             android:orientation="horizontal"

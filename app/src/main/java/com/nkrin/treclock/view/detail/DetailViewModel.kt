@@ -40,6 +40,10 @@ class DetailViewModel(
     val updatingEvents: LiveData<ViewModelEvent>
         get() = _updatingEvents
 
+    private val _removingScheduleEvents = SingleLiveEvent<ViewModelEvent>()
+    val removingScheduleEvents: LiveData<ViewModelEvent>
+        get() = _removingScheduleEvents
+
     var schedule: Schedule? = null
 
     fun loadSchedule(scheduleId: Int) {
@@ -93,6 +97,30 @@ class DetailViewModel(
                 } else {
                     Completable.complete().subscribe {
                         _addingEvents.value = Success(-1)
+                    }
+                }
+            }
+        }
+    }
+
+    fun updateSchedule(title: String, comment: String) {
+        val s = schedule
+        if (s != null) {
+            schedule?.name = title
+            schedule?.comment = comment
+            _updatingEvents.value = Pending
+            launch {
+                val ss = schedule
+                if (ss != null) {
+                    schedulerRepository.storeSchedule(ss)
+                        .fromIo(schedulerProvider).toUi(schedulerProvider)
+                        .subscribe(
+                            { _updatingEvents.value = Success() },
+                            { _updatingEvents.value = Error(it) }
+                        )
+                } else {
+                    Completable.complete().subscribe {
+                        _updatingEvents.value = Success(-1)
                     }
                 }
             }
@@ -153,26 +181,41 @@ class DetailViewModel(
         if (steps != null) {
             val from = steps.indexOfFirst { it.id == id }
             val step = steps[from]
-            if (step != null) {
-                steps.remove(step)
-                steps.add(to, step)
-                schedule?.steps = steps
-                _updatingOrderEvents.value = Pending
-                launch {
-                    val ss = schedule
-                    if (ss != null) {
-                        schedulerRepository.storeSchedule(ss)
-                            .fromIo(schedulerProvider).toUi(schedulerProvider)
-                            .subscribe(
-                                { _updatingOrderEvents.value = Success(Pair(from, to)) },
-                                { _updatingOrderEvents.value = Error(it) }
-                            )
-                    } else {
-                        Completable.complete().subscribe {
-                            _updatingOrderEvents.value = Success()
-                        }
+            steps.remove(step)
+            steps.add(to, step)
+            schedule?.steps = steps
+            _updatingOrderEvents.value = Pending
+            launch {
+                val ss = schedule
+                if (ss != null) {
+                    schedulerRepository.storeSchedule(ss)
+                        .fromIo(schedulerProvider).toUi(schedulerProvider)
+                        .subscribe(
+                            { _updatingOrderEvents.value = Success(Pair(from, to)) },
+                            { _updatingOrderEvents.value = Error(it) }
+                        )
+                } else {
+                    Completable.complete().subscribe {
+                        _updatingOrderEvents.value = Success()
                     }
                 }
+            }
+        }
+    }
+
+    fun removeSchedule() {
+        val s = schedule
+        if (s != null) {
+            schedule = null
+            val id = s.id
+            _removingScheduleEvents.value = Pending
+            launch {
+                schedulerRepository.deleteSchedulesFromId(listOf(id))
+                    .fromIo(schedulerProvider).toUi(schedulerProvider)
+                    .subscribe(
+                        { _removingScheduleEvents.value = Success() },
+                        { _removingScheduleEvents.value = Error(it) }
+                    )
             }
         }
     }

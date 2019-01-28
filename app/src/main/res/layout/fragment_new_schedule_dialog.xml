@@ -5,7 +5,7 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:context=".view.scheduler.dialog.NewScheduleDialogFragment"
+        tools:context=".view.util.dialog.NewScheduleDialogFragment"
         android:id="@+id/fragment_new_schedule_dialog">
     <LinearLayout
             android:orientation="horizontal"
