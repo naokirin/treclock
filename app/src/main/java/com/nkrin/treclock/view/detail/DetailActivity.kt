@@ -12,6 +12,7 @@ import android.support.v7.widget.helper.ItemTouchHelper
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.PopupMenu
 import android.widget.Toast
 import com.nkrin.treclock.R
 import com.nkrin.treclock.domain.entity.Schedule
@@ -28,6 +29,7 @@ import kotlinx.android.synthetic.main.activity_detail.*
 import kotlinx.android.synthetic.main.content_detail.*
 import org.koin.android.viewmodel.ext.android.viewModel
 import java.time.Duration
+
 
 class DetailActivity :
     AppCompatActivity(),
@@ -147,14 +149,14 @@ class DetailActivity :
             updateSchedule(title, comment)
         }
     }
-    override fun onClickedStepDialogPositive(id: Int, title: String, duration: Duration) {
-        if (title.isEmpty()) {
-            Toast.makeText(this , "無名のステップは作成できません", Toast.LENGTH_SHORT)
+    override fun onClickedStepDialogPositive(id: Int, title: String, duration: Duration?) {
+        when {
+            title.isEmpty() -> Toast.makeText(this , "無名のステップは作成できません", Toast.LENGTH_SHORT)
                 .show()
-        } else if (id == 0) {
-            addNewStep(title, duration)
-        } else {
-            updateStep(id, title, duration)
+            duration == null -> Toast.makeText(this , "時間指定のないステップは作成できません", Toast.LENGTH_SHORT)
+                .show()
+            id == 0 -> addNewStep(title, duration)
+            else -> updateStep(id, title, duration)
         }
     }
 
@@ -211,11 +213,23 @@ class DetailActivity :
                     newStepDialog.show(supportFragmentManager, "NewStepDialog")
                 }
             },
-            object: DetailRecycleViewAdapter.RemovingListener {
-                override fun onClickRemoving(step: Step) {
-                    this@DetailActivity.removeStep(schedule.id)
-                    Toast.makeText(this@DetailActivity, "ステップを削除しました", Toast.LENGTH_SHORT)
-                        .show()
+            object: DetailRecycleViewAdapter.ActionListener {
+                override fun onClickAction(tappedView: View, step: Step) {
+                    val popup = PopupMenu(applicationContext, tappedView)
+                    val inflater = popup.menuInflater
+                    inflater.inflate(R.menu.menu_detail_item, popup.menu)
+                    popup.setOnMenuItemClickListener {
+                        when (it?.itemId) {
+                            R.id.menu_detail_item_delete -> {
+                                this@DetailActivity.removeStep(schedule.id)
+                            }
+                            R.id.menu_detail_item_play -> {
+                                // TODO: 再生
+                            }
+                        }
+                        return@setOnMenuItemClickListener true
+                    }
+                    popup.show()
                 }
             })
             val llm = LinearLayoutManager(this)

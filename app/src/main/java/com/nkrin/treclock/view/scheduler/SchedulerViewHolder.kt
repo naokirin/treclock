@@ -11,5 +11,5 @@ import org.jetbrains.anko.find
 class SchedulerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     var titleView: TextView = itemView.findViewById(R.id.title)
     var detailView: TextView = itemView.findViewById(R.id.detail)
-    var removingButton: FloatingActionButton = itemView.find(R.id.removing_button)
+    var removingButton: FloatingActionButton = itemView.find(R.id.action_button)
 }

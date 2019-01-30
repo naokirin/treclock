@@ -44,7 +44,8 @@ class NewStepDialogFragment : DialogFragment() {
             val titleTextView = dialog.findViewById<EditText>(R.id.step_title)
             val durationTextView = dialog.findViewById<EditText>(R.id.duration_minutes)
             val title = titleTextView.text.toString()
-            val duration = Duration.ofMinutes(java.lang.Long.parseLong(durationTextView.text.toString()))
+            val durationMinutes = durationTextView.text.toString()
+            val duration = if (durationMinutes.isEmpty()) null else Duration.ofMinutes(java.lang.Long.parseLong(durationMinutes))
             val listener = activity
             if (listener is Listener) {
                 listener.onClickedStepDialogPositive(id, title, duration)
@@ -53,7 +54,7 @@ class NewStepDialogFragment : DialogFragment() {
     }
 
     interface Listener {
-        fun onClickedStepDialogPositive(id: Int, title: String, duration: Duration)
+        fun onClickedStepDialogPositive(id: Int, title: String, duration: Duration?)
     }
 
     companion object {

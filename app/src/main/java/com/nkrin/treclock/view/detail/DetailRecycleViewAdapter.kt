@@ -12,7 +12,7 @@ import com.nkrin.treclock.view.detail.DetailViewModel
 class DetailRecycleViewAdapter(
     private val viewModel: DetailViewModel,
     private val rowListener: RowListener,
-    private val removingListener: RemovingListener
+    private val actionListener: ActionListener
 ) : RecyclerView.Adapter<DetailViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DetailViewHolder {
@@ -31,8 +31,8 @@ class DetailRecycleViewAdapter(
             holder.itemView.setOnClickListener {
                 rowListener.onClickRow(it, item)
             }
-            holder.removingButton.setOnClickListener {
-                removingListener.onClickRemoving(item)
+            holder.actionButton.setOnClickListener {
+                actionListener.onClickAction(it, item)
             }
         }
     }
@@ -45,7 +45,7 @@ class DetailRecycleViewAdapter(
         fun onClickRow(tappedView: View, step: Step)
     }
 
-    interface RemovingListener {
-        fun onClickRemoving(step: Step)
+    interface ActionListener {
+        fun onClickAction(tappedView: View, step: Step)
     }
 }

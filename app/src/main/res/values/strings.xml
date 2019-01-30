@@ -15,4 +15,6 @@
     <string name="menu_detail_delete">削除</string>
     <string name="step_dialog_title">ステップ名</string>
     <string name="step_dialog_duration_minutes">時間（分）</string>
+    <string name="menu_detail_item_delete">削除</string>
+    <string name="menu_detail_item_play">ここから再生</string>
 </resources>

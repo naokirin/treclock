@@ -27,7 +27,7 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/imageView" android:layout_marginStart="8dp"
                 android:id="@+id/linearLayout"
-                android:layout_width="0dp" app:layout_constraintEnd_toStartOf="@+id/removing_button"
+                android:layout_width="0dp" app:layout_constraintEnd_toStartOf="@+id/action_button"
                 android:layout_marginEnd="116dp">
 
             <TextView
@@ -56,7 +56,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/linearLayout" app:backgroundTint="@android:color/transparent"
-                android:layout_marginEnd="16dp" android:id="@+id/removing_button" app:backgroundTintMode="src_in"
+                android:layout_marginEnd="16dp" android:id="@+id/action_button" app:backgroundTintMode="src_in"
                 app:fabSize="mini"/>
     </android.support.constraint.ConstraintLayout>
 </LinearLayout>
