@@ -2,6 +2,7 @@ package com.nkrin.treclock.view.detail
 
 import android.arch.lifecycle.Observer
 import android.os.Bundle
+import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
@@ -12,6 +13,8 @@ import android.support.v7.widget.helper.ItemTouchHelper
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.animation.AnimationUtils
+import android.widget.ImageView
 import android.widget.PopupMenu
 import android.widget.Toast
 import com.nkrin.treclock.R
@@ -20,6 +23,7 @@ import com.nkrin.treclock.domain.entity.Step
 import com.nkrin.treclock.util.mvvm.Error
 import com.nkrin.treclock.util.mvvm.Success
 import com.nkrin.treclock.view.scheduler.DetailRecycleViewAdapter
+import com.nkrin.treclock.view.scheduler.DetailViewHolder
 import com.nkrin.treclock.view.util.BackgroundItemDecoration
 import com.nkrin.treclock.view.util.ProgressDialogFragment
 import com.nkrin.treclock.view.util.dialog.NewScheduleDialogFragment
@@ -29,6 +33,7 @@ import kotlinx.android.synthetic.main.activity_detail.*
 import kotlinx.android.synthetic.main.content_detail.*
 import org.koin.android.viewmodel.ext.android.viewModel
 import java.time.Duration
+import android.view.ViewTreeObserver
 
 
 class DetailActivity :
@@ -40,6 +45,8 @@ class DetailActivity :
     private lateinit var detailList: RecyclerView
 
     private var scheduleId: Int = 0
+    private val playingStepsCallbacks: MutableMap<Int, () -> Unit> = mutableMapOf()
+    private val stoppingStepsCallbacks: MutableMap<Int, () -> Unit> = mutableMapOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -86,6 +93,20 @@ class DetailActivity :
         detailViewModel.removingScheduleEvents.observe(this, Observer {
             onRemovedSchedule()
         })
+
+        detailViewModel.playingEvents.observe(this, Observer {
+            when(it) {
+                is Success -> onPlayedOrStopped(it.value)
+                is Error -> onPlayedOrStoppedError()
+            }
+        })
+
+        detailViewModel.playingStepEvents.observe(this, Observer {
+            when(it) {
+                is Success -> onPlayedStep(it.value)
+                is Error -> onPlayedStepError()
+            }
+        })
     }
 
     override fun onResume() {
@@ -106,6 +127,12 @@ class DetailActivity :
         val inflater = menuInflater
         inflater.inflate(R.menu.menu_detail, menu)
         return true
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+        val item = menu?.findItem(R.id.menu_detail_delete)
+        item?.isVisible = detailViewModel.schedule?.played == false
+        return super.onPrepareOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -199,43 +226,72 @@ class DetailActivity :
             progressDialog = ProgressDialogFragment.create("Saving...")
             progressDialog?.show(supportFragmentManager, null)
         }
+        playingStepsCallbacks.remove(id)
+        stoppingStepsCallbacks.remove(id)
     }
 
     private fun onLoaded(schedule: Any?) {
         if (schedule is Schedule) {
             title = schedule.name
 
+            if (schedule.played) {
+                play_button.hide()
+                stop_button.show()
+            }
+
             val adapter = DetailRecycleViewAdapter(
                 detailViewModel,
             object : DetailRecycleViewAdapter.RowListener {
+                override fun onBindRow(holder: DetailViewHolder, tappedView: View, step: Step) {
+                    playingStepsCallbacks[step.id] = {
+                        val anim = AnimationUtils.loadAnimation(this@DetailActivity, R.anim.repeated_blinking_animation)
+                        val image = tappedView.findViewById<ImageView>(R.id.detail_list_row_icon)
+                        image.startAnimation(anim)
+                    }
+
+                    stoppingStepsCallbacks[step.id] = {
+                        val image = tappedView.findViewById<ImageView>(R.id.detail_list_row_icon)
+                        image.clearAnimation()
+                        image.animate().cancel()
+                        image.animation = null
+                    }
+                }
                 override fun onClickRow(tappedView: View, step: Step) {
+                    val s = detailViewModel.schedule
+                    if (s != null && s.played) {
+                        return
+                    }
+
                     val newStepDialog = NewStepDialogFragment.create(step.id, step.title, step.duration)
                     newStepDialog.show(supportFragmentManager, "NewStepDialog")
                 }
-            },
-            object: DetailRecycleViewAdapter.ActionListener {
                 override fun onClickAction(tappedView: View, step: Step) {
-                    val popup = PopupMenu(applicationContext, tappedView)
-                    val inflater = popup.menuInflater
-                    inflater.inflate(R.menu.menu_detail_item, popup.menu)
-                    popup.setOnMenuItemClickListener {
-                        when (it?.itemId) {
-                            R.id.menu_detail_item_delete -> {
-                                this@DetailActivity.removeStep(schedule.id)
+                    with(PopupMenu(applicationContext, tappedView)) {
+                        val inflater = menuInflater
+                        inflater.inflate(R.menu.menu_detail_item, menu)
+                        val deleteItem = menu.findItem(R.id.menu_detail_item_delete)
+                        deleteItem.isVisible = detailViewModel.schedule?.played == false
+                        setOnMenuItemClickListener {
+                            when (it?.itemId) {
+                                R.id.menu_detail_item_delete -> {
+                                    this@DetailActivity.removeStep(step.id)
+                                }
+                                R.id.menu_detail_item_play -> {
+                                    detailViewModel.startStep(step.id)
+                                }
                             }
-                            R.id.menu_detail_item_play -> {
-                                // TODO: 再生
-                            }
+                            return@setOnMenuItemClickListener true
                         }
-                        return@setOnMenuItemClickListener true
+                        show()
                     }
-                    popup.show()
                 }
             })
             val llm = LinearLayoutManager(this)
-            detailList.setHasFixedSize(true)
-            detailList.layoutManager = llm
-            detailList.adapter = adapter
+            detailList.let {
+                it.setHasFixedSize(true)
+                it.layoutManager = llm
+                it.adapter = adapter
+            }
 
             val ith = ItemTouchHelper(
                 object : ItemTouchHelper.SimpleCallback(
@@ -246,6 +302,10 @@ class DetailActivity :
                         recyclerView: RecyclerView,
                         viewHolder: ViewHolder, target: ViewHolder
                     ): Boolean {
+                        val s = detailViewModel.schedule
+                        if (s != null && s.played) {
+                            return false
+                        }
                         val fromPos = viewHolder.adapterPosition
                         val toPos = target.adapterPosition
                         val steps = detailViewModel.schedule?.steps
@@ -265,6 +325,14 @@ class DetailActivity :
                             removeStep(steps[fromPos].id)
                         }
                     }
+
+                    override fun getSwipeDirs(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
+                        val s = detailViewModel.schedule
+                        if (s != null && s.played) {
+                            return 0
+                        }
+                        return super.getSwipeDirs(recyclerView, viewHolder)
+                    }
                 })
             ith.attachToRecyclerView(detailList)
 
@@ -272,6 +340,29 @@ class DetailActivity :
                 val newStepDialog = NewStepDialogFragment.create(0,"", null)
                 newStepDialog.show(supportFragmentManager, "NewStepDialog")
             }
+
+            play_button.setOnClickListener {
+                val s = detailViewModel.schedule
+                if (s != null && !s.steps.isEmpty()) {
+                    detailViewModel.startSchedule()
+                    return@setOnClickListener
+                }
+                Toast.makeText(this, "スケジュール開始にはステップが一つ以上必要です", Toast.LENGTH_LONG)
+                    .show()
+            }
+
+            stop_button.setOnClickListener {
+                detailViewModel.stopSchedule()
+            }
+
+            detailList.viewTreeObserver.addOnGlobalLayoutListener (
+                object: ViewTreeObserver.OnGlobalLayoutListener {
+                    override fun onGlobalLayout() {
+                        detailViewModel.resumePlayingTimer()
+                        detailList.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                    }
+                }
+            )
         }
         progressDialog?.cancel()
     }
@@ -347,5 +438,41 @@ class DetailActivity :
     private fun onRemovedSchedule() {
         progressDialog?.cancel()
         finish()
+    }
+
+    private fun onPlayedOrStopped(playing: Any?) {
+        val play = findViewById<FloatingActionButton>(R.id.play_button)
+        val stop = findViewById<FloatingActionButton>(R.id.stop_button)
+        if (playing is Boolean) {
+            if (playing) {
+                play.hide()
+                stop.show()
+            } else {
+                stop.hide()
+                play.show()
+                stoppingStepsCallbacks.forEach { _, callback -> callback() }
+            }
+        }
+        progressDialog?.cancel()
+    }
+
+    private fun onPlayedOrStoppedError() {
+    }
+
+    private fun onPlayedStep(stepId: Any?) {
+        if (stepId is Int) {
+            playingStepsCallbacks[stepId]?.invoke()
+            stoppingStepsCallbacks.forEach { id, callback ->
+                if (id != stepId) {
+                    callback()
+                }
+            }
+        }
+    }
+
+    private fun onPlayedStepError() {
+        Snackbar.make(detail_list, "ステップを開始できませんでした。", Snackbar.LENGTH_LONG)
+            .setAction("OK") { detailViewModel.loadSchedule(scheduleId) }.show()
+        progressDialog?.cancel()
     }
 }

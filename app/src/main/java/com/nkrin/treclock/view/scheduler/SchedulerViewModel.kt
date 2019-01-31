@@ -50,7 +50,7 @@ class SchedulerViewModel(
         val index = 0
         val lastIdSchedule = list.maxBy { it.id }
         val id = if (lastIdSchedule == null) 1 else lastIdSchedule.id + 1
-        list.add(index, Schedule(id, title, comment, mutableListOf()))
+        list.add(index, Schedule(id, title, comment, false, mutableListOf()))
         launch {
             schedulerRepository.storeSchedules(list)
                 .fromIo(schedulerProvider).toUi(schedulerProvider)

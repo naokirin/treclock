@@ -27,13 +27,32 @@
             android:orientation="horizontal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" android:layout_gravity="bottom|end">
-        <android.support.design.widget.FloatingActionButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:clickable="true" app:srcCompat="@android:drawable/ic_media_play"
-                android:id="@+id/play_button"
-                android:layout_gravity="bottom|end" android:layout_marginEnd="8dp" android:layout_marginBottom="16dp"
-                android:layout_marginStart="16dp" android:layout_marginTop="16dp"/>
+        <android.support.constraint.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+            <android.support.design.widget.FloatingActionButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clickable="true" app:srcCompat="@android:drawable/ic_media_play"
+                    android:id="@+id/play_button"
+                    android:layout_gravity="bottom|end"
+                    app:backgroundTint="@color/design_default_color_primary"
+                    android:visibility="visible"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintEnd_toEndOf="parent"
+            />
+            <android.support.design.widget.FloatingActionButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:id="@+id/stop_button"
+                    android:layout_gravity="bottom|end"
+                    android:src="@drawable/ic_media_stop"
+                    app:backgroundTint="@color/colorAccent"
+                    app:layout_constraintTop_toTopOf="parent" app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" android:visibility="gone"/>
+        </android.support.constraint.ConstraintLayout>
+
         <android.support.design.widget.FloatingActionButton
                 android:id="@+id/step_add"
                 android:layout_width="wrap_content"

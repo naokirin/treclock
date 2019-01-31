@@ -25,6 +25,14 @@ class SchedulerRecycleViewAdapter(
         holder.titleView.text = item.name
         holder.detailView.text = item.comment
 
+        if (item.played) {
+            holder.removingButton.hide()
+            holder.playingText.visibility = View.VISIBLE
+        } else {
+            holder.removingButton.show()
+            holder.playingText.visibility = View.GONE
+        }
+
         holder.itemView.setOnClickListener {
             rowListener.onClickRow(it, item)
         }

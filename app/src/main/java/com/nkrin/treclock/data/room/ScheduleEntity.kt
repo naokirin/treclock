@@ -7,5 +7,6 @@ data class ScheduleEntity(
     @PrimaryKey(autoGenerate = true)
     var id: Int,
     var name: String,
-    var comment: String
+    var comment: String,
+    var played: Boolean
 )

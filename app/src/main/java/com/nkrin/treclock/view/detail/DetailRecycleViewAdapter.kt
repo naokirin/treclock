@@ -11,8 +11,7 @@ import com.nkrin.treclock.view.detail.DetailViewModel
 
 class DetailRecycleViewAdapter(
     private val viewModel: DetailViewModel,
-    private val rowListener: RowListener,
-    private val actionListener: ActionListener
+    private val rowListener: RowListener
 ) : RecyclerView.Adapter<DetailViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DetailViewHolder {
@@ -25,14 +24,18 @@ class DetailRecycleViewAdapter(
         val schedule = viewModel.schedule
         if (schedule != null) {
             val item = schedule.steps[position]
-            holder.titleView.text = item.title
-            holder.durationView.text = "${ item.duration.toMinutes() } 分"
+            with(holder) {
+                titleView.text = item.title
+                durationView.text = "${item.duration.toMinutes()} 分"
 
-            holder.itemView.setOnClickListener {
-                rowListener.onClickRow(it, item)
-            }
-            holder.actionButton.setOnClickListener {
-                actionListener.onClickAction(it, item)
+                itemView.setOnClickListener {
+                    rowListener.onClickRow(it, item)
+                }
+                actionButton.setOnClickListener {
+                    rowListener.onClickAction(it, item)
+                }
+
+                rowListener.onBindRow(holder, this.itemView, item)
             }
         }
     }
@@ -42,10 +45,8 @@ class DetailRecycleViewAdapter(
     }
 
     interface RowListener {
+        fun onBindRow(holder: DetailViewHolder, tappedView: View, step: Step)
         fun onClickRow(tappedView: View, step: Step)
-    }
-
-    interface ActionListener {
         fun onClickAction(tappedView: View, step: Step)
     }
 }
