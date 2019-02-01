@@ -12,7 +12,6 @@ import com.nkrin.treclock.util.rx.toUi
 import io.reactivex.Completable
 import java.time.Duration
 import java.time.OffsetDateTime
-import kotlin.contracts.contract
 
 class DetailViewModel(
     private val schedulerProvider: SchedulerProvider,
@@ -93,7 +92,7 @@ class DetailViewModel(
             val lastIdStep = s.steps.maxBy { it.id }
             val id = if (lastIdStep == null) 1 else lastIdStep.id + 1
             schedule?.steps?.add(
-                Step(id, s.id, index, title, duration, null, null)
+                Step(id, s.id, index, title, duration, null)
             )
             _addingEvents.value = Pending
             launch {
@@ -228,7 +227,6 @@ class DetailViewModel(
             if (schedule?.played == true) {
                 schedule?.steps?.forEach {
                     it.actualStart = null
-                    it.actualEnd = null
                 }
             }
             schedule?.played = true
@@ -251,10 +249,7 @@ class DetailViewModel(
     fun stopSchedule() {
         _playingEvents.value = Pending
         schedule?.played = false
-        schedule?.steps?.forEach {
-            it.actualStart = null
-            it.actualEnd = null
-        }
+        schedule?.steps?.forEach { it.actualStart = null }
 
         if (schedule == null) {
             _playingEvents.value = Error(Throwable("Schedule is not found"))

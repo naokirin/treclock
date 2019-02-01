@@ -25,16 +25,15 @@ data class StepEntity(
     var order: Int,
     var title: String,
     var duration: Duration,
-    val actualStart: OffsetDateTime? = null,
-    val actualEnd: OffsetDateTime? = null
+    val actualStart: OffsetDateTime? = null
 ) {
     fun to(): Step {
-        return Step(this.id, this.scheduleId, this.order, this.title, this.duration, this.actualStart, this.actualEnd)
+        return Step(this.id, this.scheduleId, this.order, this.title, this.duration, this.actualStart)
     }
 
     companion object {
         fun from(step: Step): StepEntity {
-            return StepEntity(step.id, step.scheduleId, step.order, step.title, step.duration, step.actualStart, step.actualEnd)
+            return StepEntity(step.id, step.scheduleId, step.order, step.title, step.duration, step.actualStart)
         }
     }
 }

@@ -9,6 +9,5 @@ data class Step(
     var order: Int,
     var title: String,
     var duration: Duration,
-    var actualStart: OffsetDateTime? = null,
-    var actualEnd: OffsetDateTime? = null
+    var actualStart: OffsetDateTime? = null
 )

@@ -22,7 +22,7 @@ class ScheduleAndSteps {
             val scheduleEntity = ScheduleEntity(schedule.id, schedule.name, schedule.comment, schedule.played)
 
             val stepEntities = schedule.steps.mapIndexed { index, step ->
-                StepEntity(step.id, step.scheduleId, index, step.title, step.duration, step.actualStart, step.actualEnd)
+                StepEntity(step.id, step.scheduleId, index, step.title, step.duration, step.actualStart)
             }
 
             return ScheduleAndSteps().also {
