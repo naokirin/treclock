@@ -8,8 +8,6 @@ import io.reactivex.Single
 interface ScheduleRepository {
     fun getSchedules(): Single<List<Schedule>>
 
-    fun getSchedules(ids: List<Int>): Single<List<Schedule>>
-
     fun storeSchedules(schedules: List<Schedule>): Completable
 
     fun storeSchedule(schedule: Schedule): Completable

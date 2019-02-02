@@ -1,6 +1,10 @@
 package com.nkrin.treclock.view.detail
 
+import android.app.AlarmManager
+import android.app.PendingIntent
 import android.arch.lifecycle.Observer
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.Snackbar
@@ -13,14 +17,17 @@ import android.support.v7.widget.helper.ItemTouchHelper
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewTreeObserver
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.widget.PopupMenu
 import android.widget.Toast
+import com.nkrin.treclock.R
 import com.nkrin.treclock.domain.entity.Schedule
 import com.nkrin.treclock.domain.entity.Step
 import com.nkrin.treclock.util.mvvm.Error
 import com.nkrin.treclock.util.mvvm.Success
+import com.nkrin.treclock.view.notification.AlarmNotification
 import com.nkrin.treclock.view.scheduler.DetailRecycleViewAdapter
 import com.nkrin.treclock.view.scheduler.DetailViewHolder
 import com.nkrin.treclock.view.util.BackgroundItemDecoration
@@ -29,19 +36,10 @@ import com.nkrin.treclock.view.util.dialog.NewScheduleDialogFragment
 import com.nkrin.treclock.view.util.dialog.NewStepDialogFragment
 import com.nkrin.treclock.view.util.dialog.YesNoDialogFragment
 import kotlinx.android.synthetic.main.activity_detail.*
+import kotlinx.android.synthetic.main.content_detail.*
 import org.koin.android.viewmodel.ext.android.viewModel
 import java.time.Duration
-import android.view.ViewTreeObserver
-import android.app.AlarmManager
-import android.app.PendingIntent
-import com.nkrin.treclock.view.notification.AlarmNotification
-import android.content.Intent
-import android.content.Context
-import com.nkrin.treclock.R
-import kotlinx.android.synthetic.main.content_detail.*
 import java.time.OffsetDateTime
-import java.time.ZoneOffset
-import kotlin.math.max
 
 
 class DetailActivity :
@@ -251,8 +249,9 @@ class DetailActivity :
             val title = param.first
             val duration = param.second
             val actualStart = param.third
+            val requestCode = scheduleId * 10000 + maxAlarmRequestCode
             val intent = Intent(applicationContext, AlarmNotification::class.java)
-            intent.putExtra("request_code", maxAlarmRequestCode)
+            intent.putExtra("request_code", requestCode)
             if (title is String && duration is Duration) {
                 intent.putExtra(
                     "message",
@@ -262,7 +261,7 @@ class DetailActivity :
                 intent.putExtra("message", title)
             }
             val pending = PendingIntent.getBroadcast(
-                applicationContext, maxAlarmRequestCode, intent, 0
+                applicationContext, requestCode, intent, 0
             )
 
             if (actualStart is OffsetDateTime) {

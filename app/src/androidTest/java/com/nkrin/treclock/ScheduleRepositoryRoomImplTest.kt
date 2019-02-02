@@ -71,14 +71,14 @@ class ScheduleRepositoryRoomImplTest : KoinTest {
     object Factory {
         fun schedules(): List<Schedule> {
             return listOf(
-                Schedule(1, "test1", "comment1",
-                    mutableListOf(Step(1, 1, 0, "", Duration.ofMinutes(10L), null, null))),
-                Schedule(2, "test2", "comment2",
-                    mutableListOf(Step(2, 2, 0, "", Duration.ofMinutes(10L), null, null)))
+                Schedule(1, "test1", "comment1", false,
+                    mutableListOf(Step(1, 1, 0, "", Duration.ofMinutes(10L), null))),
+                Schedule(2, "test2", "comment2", false,
+                    mutableListOf(Step(2, 2, 0, "", Duration.ofMinutes(10L), null)))
             )
         }
 
         fun schedulesAfterDeleted(): List<Schedule> {
-            return listOf(Schedule(1, "test1", "comment1", mutableListOf()))
+            return listOf(Schedule(1, "test1", "comment1", false, mutableListOf()))
         }
     }}

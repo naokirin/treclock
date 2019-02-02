@@ -94,7 +94,7 @@ class DetailViewModel(
         if (s != null) {
             val index = s.steps.size
             val lastIdStep = s.steps.maxBy { it.id }
-            val id = if (lastIdStep == null) 1 else lastIdStep.id + 1
+            val id = if (lastIdStep == null) s.id * 10000 + 1 else lastIdStep.id + 1
             schedule?.steps?.add(
                 Step(id, s.id, index, title, duration, null)
             )

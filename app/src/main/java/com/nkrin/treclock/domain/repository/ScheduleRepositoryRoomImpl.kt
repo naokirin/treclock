@@ -15,12 +15,6 @@ class ScheduleRepositoryRoomImpl(private val scheduleDao: ScheduleDao) : Schedul
         }
     }
 
-    override fun getSchedules(ids: List<Int>): Single<List<Schedule>> {
-        return scheduleDao.loadScheduleAndSteps(ids).map {
-                schedules -> schedules.map { it.to() }
-        }
-    }
-
     override fun storeSchedules(schedules: List<Schedule>): Completable {
         return Completable.create { emitter ->
             try {
@@ -48,7 +42,7 @@ class ScheduleRepositoryRoomImpl(private val scheduleDao: ScheduleDao) : Schedul
                 val scheduleAndSteps = ScheduleAndSteps.from(schedule)
                 scheduleDao.upsertSchedule(scheduleAndSteps.schedule)
                 scheduleDao.upsertSteps(scheduleAndSteps.steps)
-                val storedSchedules = getSchedules().blockingGet()
+                val storedSchedules = getSchedules().blockingGet().filter { it.id == schedule.id }
                 val deletedStepIds = storedSchedules.flatMap { it.steps }.map { it.id }
                     .subtract(scheduleAndSteps.steps.map { it.id }).toList()
                 scheduleDao.deleteStepsFromId(deletedStepIds)
