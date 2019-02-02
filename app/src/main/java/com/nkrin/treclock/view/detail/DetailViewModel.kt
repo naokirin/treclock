@@ -327,7 +327,7 @@ class DetailViewModel(
                 if (i == 0) {
                     step.actualStart = now + amount
                     _playingStepEvents.value = Success(step.id)
-                    _settingStepTimerEvents.value = Success(step.id)
+                    _settingStepTimerEvents.value = Success(Triple(step.title, step.duration, now + amount))
                 } else {
                     step.actualStart = now + amount
                     val timer = Timer(
