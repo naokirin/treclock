@@ -17,7 +17,6 @@ import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.widget.PopupMenu
 import android.widget.Toast
-import com.nkrin.treclock.R
 import com.nkrin.treclock.domain.entity.Schedule
 import com.nkrin.treclock.domain.entity.Step
 import com.nkrin.treclock.util.mvvm.Error
@@ -30,10 +29,19 @@ import com.nkrin.treclock.view.util.dialog.NewScheduleDialogFragment
 import com.nkrin.treclock.view.util.dialog.NewStepDialogFragment
 import com.nkrin.treclock.view.util.dialog.YesNoDialogFragment
 import kotlinx.android.synthetic.main.activity_detail.*
-import kotlinx.android.synthetic.main.content_detail.*
 import org.koin.android.viewmodel.ext.android.viewModel
 import java.time.Duration
 import android.view.ViewTreeObserver
+import android.app.AlarmManager
+import android.app.PendingIntent
+import com.nkrin.treclock.view.notification.AlarmNotification
+import android.content.Intent
+import android.content.Context
+import com.nkrin.treclock.R
+import kotlinx.android.synthetic.main.content_detail.*
+import java.time.OffsetDateTime
+import java.time.ZoneOffset
+import kotlin.math.max
 
 
 class DetailActivity :
@@ -47,6 +55,8 @@ class DetailActivity :
     private var scheduleId: Int = 0
     private val playingStepsCallbacks: MutableMap<Int, () -> Unit> = mutableMapOf()
     private val stoppingStepsCallbacks: MutableMap<Int, () -> Unit> = mutableMapOf()
+
+    private var maxAlarmRequestCode = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -105,6 +115,12 @@ class DetailActivity :
             when(it) {
                 is Success -> onPlayedStep(it.value)
                 is Error -> onPlayedStepError()
+            }
+        })
+
+        detailViewModel.settingStepTimerEvents.observe(this, Observer {
+            if (it is Success) {
+                setAlarm(it.value)
             }
         })
     }
@@ -230,6 +246,57 @@ class DetailActivity :
         stoppingStepsCallbacks.remove(id)
     }
 
+    private fun setAlarm(param: Any?) {
+        if (param is Triple<*, *, *>) {
+            val title = param.first
+            val duration = param.second
+            val actualStart = param.third
+            val intent = Intent(applicationContext, AlarmNotification::class.java)
+            intent.putExtra("request_code", maxAlarmRequestCode)
+            if (title is String && duration is Duration) {
+                intent.putExtra(
+                    "message",
+                    "$title 開始${System.lineSeparator()}${duration.toMinutes()}分間"
+                )
+            } else if (title is String && duration == null) {
+                intent.putExtra("message", title)
+            }
+            val pending = PendingIntent.getBroadcast(
+                applicationContext, maxAlarmRequestCode, intent, 0
+            )
+
+            if (actualStart is OffsetDateTime) {
+                val am = getSystemService(Context.ALARM_SERVICE)
+                if (am is AlarmManager) {
+                    val millis = actualStart.toEpochSecond() * 1000L
+                    am.setExact(
+                        AlarmManager.RTC_WAKEUP,
+                        millis,
+                        pending
+                    )
+                }
+            }
+            maxAlarmRequestCode += 1
+        }
+    }
+
+    private fun stopAlarms() {
+        val max = detailViewModel.schedule?.steps?.size ?: 0
+        for (i in 0..max) {
+            val intent = Intent(
+                applicationContext, AlarmNotification::class.java
+            )
+            val pending = PendingIntent.getBroadcast(
+                applicationContext, i, intent, PendingIntent.FLAG_CANCEL_CURRENT
+            )
+            val am = getSystemService(ALARM_SERVICE)
+            if (am is AlarmManager) {
+                am.cancel(pending)
+            }
+        }
+        maxAlarmRequestCode = 0
+    }
+
     private fun onLoaded(schedule: Any?) {
         if (schedule is Schedule) {
             title = schedule.name
@@ -352,6 +419,7 @@ class DetailActivity :
             }
 
             stop_button.setOnClickListener {
+                stopAlarms()
                 detailViewModel.stopSchedule()
             }
 

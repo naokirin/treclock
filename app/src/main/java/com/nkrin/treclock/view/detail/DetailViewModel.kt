@@ -54,6 +54,10 @@ class DetailViewModel(
     val playingStepEvents: LiveData<ViewModelEvent>
         get() = _playingStepEvents
 
+    private val _settingStepTimerEvents = SingleLiveEvent<ViewModelEvent>()
+    val settingStepTimerEvents: LiveData<ViewModelEvent>
+        get() = _settingStepTimerEvents
+
     var schedule: Schedule? = null
 
     fun loadSchedule(scheduleId: Int) {
@@ -324,6 +328,7 @@ class DetailViewModel(
                 if (i == 0) {
                     step.actualStart = now + amount
                     _playingStepEvents.value = Success(step.id)
+                    _settingStepTimerEvents.value = Success(step.id)
                 } else {
                     step.actualStart = now + amount
                     val timer = Timer(
@@ -335,6 +340,7 @@ class DetailViewModel(
                     }
                     timers.add(timer)
                     timer.start()
+                    _settingStepTimerEvents.value = Success(Triple(step.title, step.duration, now + amount))
                 }
                 amount += step.duration
             }
@@ -348,6 +354,7 @@ class DetailViewModel(
             }
             timers.add(timer)
             timer.start()
+            _settingStepTimerEvents.value = Success(Triple("終了", null, now + amount))
         }
     }
 
