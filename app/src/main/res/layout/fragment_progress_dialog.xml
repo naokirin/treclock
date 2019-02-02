@@ -19,7 +19,7 @@
             android:layout_marginBottom="16dp"
             android:indeterminate="true"
             android:indeterminateTintMode="src_in"
-            android:indeterminateTint="@color/design_default_color_primary"/>
+            android:indeterminateTint="@color/colorPrimary"/>
 
     <TextView
             android:id="@+id/progress_message"

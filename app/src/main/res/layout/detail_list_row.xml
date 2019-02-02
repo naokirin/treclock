@@ -33,8 +33,8 @@
                     android:id="@+id/title"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:layout_weight="0.5" android:text="title"
-                    android:textSize="24sp"/>
+                    android:layout_weight="0.5" android:text="登山口〜あいうえお"
+                    android:textAppearance="@style/TextAppearance.AppCompat" android:textSize="18sp"/>
             <View
                     android:layout_width="match_parent"
                     android:id="@+id/view" android:layout_weight="0.5" android:layout_height="1dp"
@@ -44,7 +44,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_weight="0.5" android:text="00分"
-                    android:textAppearance="@style/TextAppearance.AppCompat" android:textSize="18sp"/>
+                    android:textSize="18sp"/>
 
         </LinearLayout>
         <ImageButton

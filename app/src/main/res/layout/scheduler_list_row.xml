@@ -35,17 +35,16 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="0.5"
-                    android:textSize="24sp"
                     android:ellipsize="end"
-                    android:singleLine="true"/>
+                    android:singleLine="true" android:textAppearance="@style/TextAppearance.AppCompat"
+                    android:textSize="18sp"/>
             <TextView
                     android:id="@+id/detail"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_weight="0.5"
-                    android:textAppearance="@style/TextAppearance.AppCompat" android:textSize="18sp"
                     android:ellipsize="end"
-                    android:singleLine="true"/>
+                    android:singleLine="true" android:textSize="18sp"/>
 
         </LinearLayout>
         <android.support.design.widget.FloatingActionButton

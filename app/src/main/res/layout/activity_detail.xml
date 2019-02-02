@@ -36,7 +36,7 @@
                     android:clickable="true" app:srcCompat="@android:drawable/ic_media_play"
                     android:id="@+id/play_button"
                     android:layout_gravity="bottom|end"
-                    app:backgroundTint="@color/design_default_color_primary"
+                    app:backgroundTint="@color/colorPrimary"
                     android:visibility="visible"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintEnd_toEndOf="parent"
