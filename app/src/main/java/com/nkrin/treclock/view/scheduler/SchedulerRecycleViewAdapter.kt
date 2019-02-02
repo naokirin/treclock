@@ -6,10 +6,12 @@ import android.view.View
 import android.view.ViewGroup
 import com.nkrin.treclock.R
 import com.nkrin.treclock.domain.entity.Schedule
+import com.nkrin.treclock.util.time.TimeProvider
 
 
 class SchedulerRecycleViewAdapter(
     private val viewModel: SchedulerViewModel,
+    private val timeProvider: TimeProvider,
     private val rowListener: RowListener,
     private val removingListener: RemovingListener
 ) : RecyclerView.Adapter<SchedulerViewHolder>() {
@@ -25,7 +27,7 @@ class SchedulerRecycleViewAdapter(
         holder.titleView.text = item.name
         holder.detailView.text = item.comment
 
-        if (item.played) {
+        if (item.played(timeProvider.now())) {
             holder.removingButton.hide()
             holder.playingText.visibility = View.VISIBLE
         } else {

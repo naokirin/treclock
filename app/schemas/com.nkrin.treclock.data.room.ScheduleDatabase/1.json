@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "653c09b4ec6bd36fa0ca2ef4f581b80f",
+    "identityHash": "5d87913b6fd795a9339cae124e08cc9a",
     "entities": [
       {
         "tableName": "schedules",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `comment` TEXT NOT NULL, `played` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `comment` TEXT NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -24,12 +24,6 @@
             "fieldPath": "comment",
             "columnName": "comment",
             "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "played",
-            "columnName": "played",
-            "affinity": "INTEGER",
             "notNull": true
           }
         ],
@@ -116,7 +110,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"653c09b4ec6bd36fa0ca2ef4f581b80f\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"5d87913b6fd795a9339cae124e08cc9a\")"
     ]
   }
 }

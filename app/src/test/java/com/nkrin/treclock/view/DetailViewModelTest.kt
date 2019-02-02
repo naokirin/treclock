@@ -6,6 +6,7 @@ import com.nkrin.treclock.domain.entity.Schedule
 import com.nkrin.treclock.domain.entity.Step
 import com.nkrin.treclock.domain.repository.ScheduleRepository
 import com.nkrin.treclock.util.TestSchedulerProvider
+import com.nkrin.treclock.util.TestTimeProvider
 import com.nkrin.treclock.util.capture
 import com.nkrin.treclock.util.mvvm.*
 import com.nkrin.treclock.util.mvvm.ViewModelEvent
@@ -44,14 +45,14 @@ class DetailViewModelTest: KoinTest {
 
         given(repository.storeSchedule(com.nkrin.treclock.util.any())).willReturn(Completable.complete())
 
-        viewModel = DetailViewModel(TestSchedulerProvider, repository)
+        viewModel = DetailViewModel(TestSchedulerProvider, TestTimeProvider, repository)
 
         viewModel.loadingEvents.observeForever(view)
     }
 
     @Test
     fun testLoad() {
-        val list = listOf(Schedule(1, "a", "", false, (mutableListOf(mock(Step::class.java)))))
+        val list = listOf(Schedule(1, "a", "", mutableListOf(mock(Step::class.java))))
         given(repository.getSchedules()).willReturn(Single.just(list))
         viewModel.loadSchedule(1)
 
@@ -72,7 +73,7 @@ class DetailViewModelTest: KoinTest {
     fun testAddStep() {
         val title = "title"
         val duration = Duration.ofMinutes(1)
-        viewModel.schedule = Schedule(1, "schedule", "comment", false, mutableListOf())
+        viewModel.schedule = Schedule(1, "schedule", "comment", mutableListOf())
         viewModel.addStep(title, duration)
 
         verify(repository, times(1)).storeSchedule(capture(captor))

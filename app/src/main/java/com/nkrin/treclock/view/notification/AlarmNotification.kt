@@ -23,7 +23,7 @@ class AlarmNotification : BroadcastReceiver() {
         val channelId = "default"
         val title = context.getString(R.string.app_name)
 
-        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE)
         val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
 
         val channel = NotificationChannel(
@@ -38,7 +38,7 @@ class AlarmNotification : BroadcastReceiver() {
         channel.setSound(defaultSoundUri, null)
         channel.setShowBadge(true)
 
-        if (notificationManager != null) {
+        if (notificationManager is NotificationManager) {
             notificationManager.createNotificationChannel(channel)
             val notification = Notification.Builder(context, channelId)
                 .setContentTitle(title)

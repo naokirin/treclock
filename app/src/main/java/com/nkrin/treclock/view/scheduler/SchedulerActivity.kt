@@ -13,17 +13,20 @@ import com.nkrin.treclock.domain.entity.Schedule
 import com.nkrin.treclock.util.mvvm.Error
 import com.nkrin.treclock.util.mvvm.Pending
 import com.nkrin.treclock.util.mvvm.Success
+import com.nkrin.treclock.util.time.TimeProvider
 import com.nkrin.treclock.view.detail.DetailActivity
 import com.nkrin.treclock.view.util.dialog.NewScheduleDialogFragment
 import com.nkrin.treclock.view.util.BackgroundItemDecoration
 import com.nkrin.treclock.view.util.ProgressDialogFragment
 import kotlinx.android.synthetic.main.activity_scheduler.*
 import org.jetbrains.anko.intentFor
+import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.viewModel
 
 class SchedulerActivity : AppCompatActivity(), NewScheduleDialogFragment.Listener {
 
     private val schedulerViewModel: SchedulerViewModel by viewModel()
+    private val timeProvider: TimeProvider by inject()
     private lateinit var schedulerList: RecyclerView
 
     private var progressDialog: ProgressDialogFragment? = null
@@ -116,6 +119,7 @@ class SchedulerActivity : AppCompatActivity(), NewScheduleDialogFragment.Listene
     private fun onLoaded() {
         val adapter = SchedulerRecycleViewAdapter(
             schedulerViewModel,
+            timeProvider,
             object : SchedulerRecycleViewAdapter.RowListener {
                 override fun onClickRow(tappedView: View, schedule: Schedule) {
                     this@SchedulerActivity.openDetail(schedule)

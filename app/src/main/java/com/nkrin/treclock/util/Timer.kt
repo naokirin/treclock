@@ -14,12 +14,11 @@ class Timer(
 
     private val disposables = CompositeDisposable()
 
-    fun start() {
-        val startTime = OffsetDateTime.now()
-        if (time > startTime) {
+    fun start(now: OffsetDateTime) {
+        if (time > now) {
             disposables.add(
                 Completable.timer(
-                    time.toEpochSecond() - startTime.toEpochSecond(),
+                    time.toEpochSecond() - now.toEpochSecond(),
                     TimeUnit.SECONDS
                 )
                     .subscribeOn(fromScheduler).observeOn(toScheduler)

@@ -27,6 +27,7 @@ import com.nkrin.treclock.domain.entity.Schedule
 import com.nkrin.treclock.domain.entity.Step
 import com.nkrin.treclock.util.mvvm.Error
 import com.nkrin.treclock.util.mvvm.Success
+import com.nkrin.treclock.util.time.TimeProvider
 import com.nkrin.treclock.view.notification.AlarmNotification
 import com.nkrin.treclock.view.scheduler.DetailRecycleViewAdapter
 import com.nkrin.treclock.view.scheduler.DetailViewHolder
@@ -37,6 +38,7 @@ import com.nkrin.treclock.view.util.dialog.NewStepDialogFragment
 import com.nkrin.treclock.view.util.dialog.YesNoDialogFragment
 import kotlinx.android.synthetic.main.activity_detail.*
 import kotlinx.android.synthetic.main.content_detail.*
+import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.viewModel
 import java.time.Duration
 import java.time.OffsetDateTime
@@ -47,6 +49,7 @@ class DetailActivity :
     NewStepDialogFragment.Listener, NewScheduleDialogFragment.Listener, YesNoDialogFragment.Listener {
 
     private val detailViewModel: DetailViewModel by viewModel()
+    private val timeProvider: TimeProvider by inject()
     private var progressDialog: ProgressDialogFragment? = null
     private lateinit var detailList: RecyclerView
 
@@ -145,7 +148,7 @@ class DetailActivity :
 
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
         val item = menu?.findItem(R.id.menu_detail_delete)
-        item?.isVisible = detailViewModel.schedule?.played == false
+        item?.isVisible = detailViewModel.schedule?.played(timeProvider.now()) == false
         return super.onPrepareOptionsMenu(menu)
     }
 
@@ -301,7 +304,7 @@ class DetailActivity :
         if (schedule is Schedule) {
             supportActionBar?.title = schedule.name
 
-            if (schedule.played) {
+            if (schedule.played(timeProvider.now())) {
                 play_button.hide()
                 stop_button.show()
             }
@@ -325,7 +328,7 @@ class DetailActivity :
                 }
                 override fun onClickRow(tappedView: View, step: Step) {
                     val s = detailViewModel.schedule
-                    if (s != null && s.played) {
+                    if (s != null && s.played(timeProvider.now())) {
                         return
                     }
 
@@ -337,7 +340,7 @@ class DetailActivity :
                         val inflater = menuInflater
                         inflater.inflate(R.menu.menu_detail_item, menu)
                         val deleteItem = menu.findItem(R.id.menu_detail_item_delete)
-                        deleteItem.isVisible = detailViewModel.schedule?.played == false
+                        deleteItem.isVisible = detailViewModel.schedule?.played(timeProvider.now()) == false
                         setOnMenuItemClickListener {
                             when (it?.itemId) {
                                 R.id.menu_detail_item_delete -> {
@@ -370,7 +373,7 @@ class DetailActivity :
                         viewHolder: ViewHolder, target: ViewHolder
                     ): Boolean {
                         val s = detailViewModel.schedule
-                        if (s != null && s.played) {
+                        if (s != null && s.played(timeProvider.now())) {
                             return false
                         }
                         val fromPos = viewHolder.adapterPosition
@@ -395,7 +398,7 @@ class DetailActivity :
 
                     override fun getSwipeDirs(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
                         val s = detailViewModel.schedule
-                        if (s != null && s.played) {
+                        if (s != null && s.played(timeProvider.now())) {
                             return 0
                         }
                         return super.getSwipeDirs(recyclerView, viewHolder)

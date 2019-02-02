@@ -9,12 +9,13 @@ import com.nkrin.treclock.util.mvvm.*
 import com.nkrin.treclock.util.rx.SchedulerProvider
 import com.nkrin.treclock.util.rx.fromIo
 import com.nkrin.treclock.util.rx.toUi
+import com.nkrin.treclock.util.time.TimeProvider
 import io.reactivex.Completable
 import java.time.Duration
-import java.time.OffsetDateTime
 
 class DetailViewModel(
     private val schedulerProvider: SchedulerProvider,
+    private val timeProvider: TimeProvider,
     private val schedulerRepository: ScheduleRepository
 ): BaseViewModel() {
 
@@ -228,12 +229,11 @@ class DetailViewModel(
                 _playingEvents.value = Error(Throwable("Schedule is not found"))
                 return
             }
-            if (schedule?.played == true) {
+            if (schedule?.played(timeProvider.now()) == true) {
                 schedule?.steps?.forEach {
                     it.actualStart = null
                 }
             }
-            schedule?.played = true
             startPlayingTimer(id)
             playOrStopSchedule(true)
         }
@@ -252,7 +252,6 @@ class DetailViewModel(
 
     fun stopSchedule() {
         _playingEvents.value = Pending
-        schedule?.played = false
         schedule?.steps?.forEach { it.actualStart = null }
 
         if (schedule == null) {
@@ -285,7 +284,7 @@ class DetailViewModel(
     fun resumePlayingTimer() {
         stopPlayingTimers()
 
-        val now = OffsetDateTime.now()
+        val now = timeProvider.now()
         val step = schedule?.steps?.lastOrNull {
             val actualStart = it.actualStart
             actualStart != null && actualStart <= now
@@ -320,7 +319,7 @@ class DetailViewModel(
 
         val index = schedule?.steps?.indexOfFirst { it.id == stepId }
         if (index != null && index != -1) {
-            val now = OffsetDateTime.now()
+            val now = timeProvider.now()
             val steps = schedule?.steps?.filterIndexed { i, _ -> i >= index }
             var amount = Duration.ZERO - offset
 
@@ -339,7 +338,7 @@ class DetailViewModel(
                         _playingStepEvents.value = Success(step.id)
                     }
                     timers.add(timer)
-                    timer.start()
+                    timer.start(timeProvider.now())
                     _settingStepTimerEvents.value = Success(Triple(step.title, step.duration, now + amount))
                 }
                 amount += step.duration
@@ -349,11 +348,10 @@ class DetailViewModel(
                 schedulerProvider.computation(),
                 schedulerProvider.ui()
             ) {
-                schedule?.played = false
                 playOrStopSchedule(false)
             }
             timers.add(timer)
-            timer.start()
+            timer.start(timeProvider.now())
             _settingStepTimerEvents.value = Success(Triple("終了", null, now + amount))
         }
     }

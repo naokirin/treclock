@@ -36,8 +36,8 @@ class ScheduleDaoTest : KoinTest {
     @Test
     fun testInsertSchedules() {
         val entities = listOf(
-            ScheduleEntity(1, "test1", "comment1", false),
-            ScheduleEntity(2, "test2", "comment2", false)
+            ScheduleEntity(1, "test1", "comment1"),
+            ScheduleEntity(2, "test2", "comment2")
         )
 
         scheduleDao.insertSchedules(entities)
@@ -49,8 +49,8 @@ class ScheduleDaoTest : KoinTest {
     @Test
     fun testInsertSteps() {
         val entities = listOf(
-            ScheduleEntity(1, "test1", "comment1", false),
-            ScheduleEntity(2, "test2", "comment2", false)
+            ScheduleEntity(1, "test1", "comment1"),
+            ScheduleEntity(2, "test2", "comment2")
         )
 
         val stepEntities = listOf(
@@ -162,7 +162,7 @@ class ScheduleDaoTest : KoinTest {
         scheduleDao.insertSchedules(entities)
         scheduleDao.insertSteps(stepEntities)
 
-        val inserted = ScheduleEntity(3, "test3", "comment3", false)
+        val inserted = ScheduleEntity(3, "test3", "comment3")
         val updated = entities.map { it.also { it.comment = "updated" } }
         val expected = updated + inserted
         scheduleDao.upsertSchedules(expected)
@@ -200,8 +200,8 @@ class ScheduleDaoTest : KoinTest {
     object Factory {
         fun scheduleEntities(): List<ScheduleEntity> {
             return listOf(
-                ScheduleEntity(1, "test1", "comment1", false),
-                ScheduleEntity(2, "test2", "comment2", false)
+                ScheduleEntity(1, "test1", "comment1"),
+                ScheduleEntity(2, "test2", "comment2")
             )
         }
 
