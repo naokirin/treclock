@@ -184,7 +184,7 @@ class DetailActivity :
 
     override fun onClickedScheduleDialogPositive(id: Int, title: String, comment: String) {
         if (title.isEmpty()) {
-            Toast.makeText(this , "スケジュールを無名にはできません", Toast.LENGTH_SHORT)
+            Toast.makeText(this, "スケジュールを無名にはできません", Toast.LENGTH_SHORT)
                 .show()
         } else {
             updateSchedule(title, comment)
@@ -194,8 +194,9 @@ class DetailActivity :
         when {
             title.isEmpty() -> Toast.makeText(this , "無名のステップは作成できません", Toast.LENGTH_SHORT)
                 .show()
-            duration == null -> Toast.makeText(this , "時間指定のないステップは作成できません", Toast.LENGTH_SHORT)
-                .show()
+            duration == null || duration.isZero || duration.isNegative ->
+                Toast.makeText(this , "時間指定のないステップは作成できません", Toast.LENGTH_SHORT)
+                    .show()
             id == 0 -> addNewStep(title, duration)
             else -> updateStep(id, title, duration)
         }
@@ -298,7 +299,7 @@ class DetailActivity :
 
     private fun onLoaded(schedule: Any?) {
         if (schedule is Schedule) {
-            title = schedule.name
+            supportActionBar?.title = schedule.name
 
             if (schedule.played) {
                 play_button.hide()
