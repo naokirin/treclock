@@ -21,11 +21,11 @@
             android:layout_marginStart="8dp">
         <TextView
                 android:text="@string/schedule_dialog_title"
-                android:layout_width="150dp"
+                android:layout_width="120dp"
                 android:layout_height="match_parent"
                 android:id="@+id/schedule_title_text"
                 android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-                android:textSize="18sp"
+                android:textSize="16sp"
                 android:gravity="center_vertical"/>
         <EditText
                 android:id="@+id/schedule_title"
@@ -33,7 +33,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/schedule_title"
-                android:autofillHints=""/>
+                android:autofillHints="" android:textSize="16sp"/>
     </LinearLayout>
     <LinearLayout
             android:orientation="horizontal"
@@ -47,11 +47,11 @@
             android:layout_marginEnd="8dp">
         <TextView
                 android:text="@string/scheduler_dialog_comment"
-                android:layout_width="150dp"
+                android:layout_width="120dp"
                 android:layout_height="match_parent"
                 android:id="@+id/duration_minutes_text"
                 android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-                android:textSize="18sp"
+                android:textSize="16sp"
                 android:gravity="center_vertical"/>
         <EditText
                 android:id="@+id/schedule_comment"
@@ -59,7 +59,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"
-                android:hint="@string/scheduler_dialog_comment" android:autofillHints=""/>
+                android:hint="@string/scheduler_dialog_comment" android:autofillHints="" android:textSize="16sp"/>
 
 
     </LinearLayout>

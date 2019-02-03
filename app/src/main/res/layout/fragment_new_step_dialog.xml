@@ -18,14 +18,14 @@
                 android:text="@string/step_dialog_title"
                 android:layout_width="100dp"
                 android:layout_height="match_parent" android:id="@+id/step_title_text"
-                android:textAppearance="@style/TextAppearance.AppCompat.Caption" android:textSize="18sp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Caption" android:textSize="16sp"
                 android:gravity="center_vertical"/>
         <EditText
                 android:id="@+id/step_title"
                 android:inputType="text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/step_dialog_title" android:autofillHints=""/>
+                android:hint="@string/step_dialog_title" android:autofillHints="" android:textSize="16sp"/>
     </LinearLayout>
     <LinearLayout
             android:orientation="horizontal"
@@ -38,7 +38,7 @@
                 android:text="@string/step_dialog_duration_minutes"
                 android:layout_width="100dp"
                 android:layout_height="match_parent" android:id="@+id/duration_minutes_text"
-                android:textAppearance="@style/TextAppearance.AppCompat.Caption" android:textSize="18sp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Caption" android:textSize="16sp"
                 android:gravity="center_vertical"/>
         <EditText
                 android:layout_width="match_parent"
