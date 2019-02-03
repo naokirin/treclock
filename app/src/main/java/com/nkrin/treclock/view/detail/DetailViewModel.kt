@@ -14,6 +14,7 @@ import com.nkrin.treclock.util.rx.fromIo
 import com.nkrin.treclock.util.rx.toUi
 import com.nkrin.treclock.util.time.TimeProvider
 import io.reactivex.Completable
+import io.reactivex.disposables.CompositeDisposable
 import java.time.Duration
 
 class DetailViewModel(
@@ -33,14 +34,6 @@ class DetailViewModel(
     private val _removingEvents = SingleLiveEvent<ViewModelEvent>()
     val removingEvents: LiveData<ViewModelEvent>
         get() = _removingEvents
-
-    private val _updatingOrderEvents = SingleLiveEvent<ViewModelEvent>()
-    val updatingOrderEvents: LiveData<ViewModelEvent>
-        get() = _updatingOrderEvents
-
-    private val _storingEvents = SingleLiveEvent<ViewModelEvent>()
-    val storingEvents: LiveData<ViewModelEvent>
-        get() = _storingEvents
 
     private val _updatingEvents = SingleLiveEvent<ViewModelEvent>()
     val updatingEvents: LiveData<ViewModelEvent>
@@ -90,16 +83,13 @@ class DetailViewModel(
         }
     }
 
-    fun storeSchedule() {
+    private fun storeSchedule() {
         val s = schedule
         if (s != null) {
             launch {
                 schedulerRepository.storeSchedule(s)
                     .fromIo(schedulerProvider).toUi(schedulerProvider)
-                    .subscribe(
-                        { _storingEvents.value = Success() },
-                        { _storingEvents.value = Error(it) }
-                    )
+                    .subscribe()
             }
         }
     }
@@ -199,20 +189,14 @@ class DetailViewModel(
             steps.remove(step)
             steps.add(to, step)
             schedule?.steps = steps
-            _updatingOrderEvents.value = Pending
             launch {
                 val ss = schedule
                 if (ss != null) {
                     schedulerRepository.storeSchedule(ss)
                         .fromIo(schedulerProvider).toUi(schedulerProvider)
-                        .subscribe(
-                            { _updatingOrderEvents.value = Success(Pair(from, to)) },
-                            { _updatingOrderEvents.value = Error(it) }
-                        )
+                        .subscribe()
                 } else {
-                    Completable.complete().subscribe {
-                        _updatingOrderEvents.value = Success()
-                    }
+                    CompositeDisposable()
                 }
             }
         }
