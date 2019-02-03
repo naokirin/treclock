@@ -1,7 +1,6 @@
 package com.nkrin.treclock.view.detail
 
 import android.app.AlarmManager
-import android.app.PendingIntent
 import android.arch.lifecycle.Observer
 import android.content.Context
 import android.content.Intent
@@ -28,8 +27,10 @@ import com.nkrin.treclock.domain.entity.Step
 import com.nkrin.treclock.util.mvvm.Error
 import com.nkrin.treclock.util.mvvm.Success
 import com.nkrin.treclock.util.time.TimeProvider
-import com.nkrin.treclock.view.notification.AlarmNotification
+import com.nkrin.treclock.view.alarm.Alarm
+import com.nkrin.treclock.view.alarm.AlarmPlayer
 import com.nkrin.treclock.view.notification.Notification
+import com.nkrin.treclock.view.notification.NotificationReceiver
 import com.nkrin.treclock.view.scheduler.DetailRecycleViewAdapter
 import com.nkrin.treclock.view.scheduler.DetailViewHolder
 import com.nkrin.treclock.view.util.BackgroundItemDecoration
@@ -58,8 +59,6 @@ class DetailActivity :
     private var scheduleId: Int = 0
     private val playingStepsCallbacks: MutableMap<Int, () -> Unit> = mutableMapOf()
     private val stoppingStepsCallbacks: MutableMap<Int, () -> Unit> = mutableMapOf()
-
-    private var maxAlarmRequestCode = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -255,56 +254,45 @@ class DetailActivity :
             val title = param.first
             val duration = param.second
             val actualStart = param.third
-            val requestCode = scheduleId * 10000 + maxAlarmRequestCode
-            val intent = Intent(applicationContext, AlarmNotification::class.java)
-            intent.putExtra("request_code", requestCode)
-            if (title is String && duration is Duration && actualStart is OffsetDateTime) {
-                val formatter = DateTimeFormatter.ofPattern("HH:mm")
-                val endMessage = formatter.format(actualStart + duration)
-                intent.putExtra("message", "〜${endMessage}"
-                )
-            } else if (title is String && duration == null) {
-                intent.putExtra("message", title)
-            }
-            intent.putExtra(
-                "title",
-                "$title [${detailViewModel.schedule?.name ?: ""}]")
-            val pending = PendingIntent.getBroadcast(applicationContext, requestCode, intent, 0)
-            if (actualStart is OffsetDateTime) {
-                if (actualStart <= timeProvider.now()) {
-                    Notification().notify(applicationContext, intent)
-                } else {
-                    val am = getSystemService(Context.ALARM_SERVICE)
-                    if (am is AlarmManager) {
-                        val millis = actualStart.toEpochSecond() * 1000L
-                        am.setExact(
-                            AlarmManager.RTC_WAKEUP,
-                            millis,
-                            pending
+
+            val intentSetup = { intent: Intent ->
+                with(intent) {
+                    if (title is String && duration is Duration && actualStart is OffsetDateTime) {
+                        val formatter = DateTimeFormatter.ofPattern("HH:mm")
+                        val endMessage = formatter.format(actualStart + duration)
+                        putExtra(
+                            "message", "〜${endMessage}"
                         )
+                    } else if (title is String && duration == null) {
+                        putExtra("message", title)
                     }
+                    putExtra(
+                        "title",
+                        "$title [${detailViewModel.schedule?.name ?: ""}]"
+                    )
                 }
             }
-            maxAlarmRequestCode += 1
+            val alarmManager = getSystemService(Context.ALARM_SERVICE)
+            if (alarmManager is AlarmManager) {
+                val alarm = Alarm(
+                    AlarmPlayer.createNewRequestCode(),
+                    actualStart as OffsetDateTime,
+                    timeProvider.now(),
+                    Notification()::notify,
+                    intentSetup,
+                    applicationContext,
+                    NotificationReceiver::class.java,
+                    alarmManager
+                )
+
+                AlarmPlayer.setUp("$scheduleId", alarm)
+            }
         }
     }
 
     private fun stopAlarms() {
-        val max = detailViewModel.schedule?.steps?.size ?: 0
-        for (i in 0..max) {
-            val intent = Intent(
-                applicationContext, AlarmNotification::class.java
-            )
-            val pending = PendingIntent.getBroadcast(
-                applicationContext, scheduleId * 10000 + i, intent, PendingIntent.FLAG_UPDATE_CURRENT
-            )
-            val am = getSystemService(ALARM_SERVICE)
-            if (am is AlarmManager) {
-                am.cancel(pending)
-            }
-        }
+        AlarmPlayer.cancel("$scheduleId")
         Notification().cancelAll(applicationContext)
-        maxAlarmRequestCode = 0
     }
 
     private fun onLoaded(schedule: Any?) {
@@ -439,7 +427,9 @@ class DetailActivity :
             detailList.viewTreeObserver.addOnGlobalLayoutListener (
                 object: ViewTreeObserver.OnGlobalLayoutListener {
                     override fun onGlobalLayout() {
-                        detailViewModel.resumePlayingTimer()
+                        if (detailViewModel.schedule?.played(timeProvider.now()) == true) {
+                            detailViewModel.resumePlayingTimer()
+                        }
                         detailList.viewTreeObserver.removeOnGlobalLayoutListener(this)
                     }
                 }

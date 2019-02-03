@@ -30,7 +30,7 @@
                 android:parentActivityName=".view.scheduler.SchedulerActivity">
         </activity>
         <receiver
-                android:name=".view.notification.AlarmNotification"
+                android:name=".view.notification.NotificationReceiver"
                 android:process=":remote" >
         </receiver></application>
 
