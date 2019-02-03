@@ -56,6 +56,7 @@ class DetailActivity :
     private val timeProvider: TimeProvider by inject()
     private var progressDialog: ProgressDialogFragment? = null
     private lateinit var detailList: RecyclerView
+    private lateinit var detailOptionsMenu: DetailOptionsMenu
 
     private val playingStepsCallbacks: MutableMap<Int, () -> Unit> = mutableMapOf()
     private val stoppingStepsCallbacks: MutableMap<Int, () -> Unit> = mutableMapOf()
@@ -64,6 +65,7 @@ class DetailActivity :
         super.onCreate(savedInstanceState)
 
         lifecycle.addObserver(detailViewModel)
+        detailOptionsMenu = DetailOptionsMenu(this, detailViewModel, timeProvider)
 
         setContentView(R.layout.activity_detail)
         setSupportActionBar(toolbar)
@@ -134,65 +136,6 @@ class DetailActivity :
                 setAlarm(it.value)
             }
         })
-    }
-
-    override fun onResume() {
-        super.onResume()
-        scheduleId = intent?.getIntExtra("schedule_id", 0) ?: 0
-        progressDialog = ProgressDialogFragment.create("Loading...")
-        progressDialog?.show(supportFragmentManager, null)
-
-        detailViewModel.loadSchedule(scheduleId)
-    }
-
-    override fun onPause() {
-        super.onPause()
-        detailViewModel.storeSchedule()
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        val inflater = menuInflater
-        inflater.inflate(R.menu.menu_detail, menu)
-        return true
-    }
-
-    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
-        val item = menu?.findItem(R.id.menu_detail_delete)
-        item?.isVisible = detailViewModel.schedule?.played(timeProvider.now()) == false
-        return super.onPrepareOptionsMenu(menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.menu_detail_edit -> {
-                val schedule = detailViewModel.schedule
-                if (schedule != null) {
-                    val dialog = NewScheduleDialogFragment.create(schedule.id, schedule.name, schedule.comment)
-                    dialog.show(supportFragmentManager, null)
-                    return true
-                }
-                return false
-            }
-            R.id.menu_detail_delete -> {
-                val schedule = detailViewModel.schedule
-                if (schedule != null) {
-                    val dialog = YesNoDialogFragment.create(
-                        "removing_schedule_dialog",
-                        "スケジュールを削除します",
-                        "はい",
-                        "いいえ"
-                    )
-                    dialog.show(supportFragmentManager, null)
-                    return true
-                }
-                return false
-            }
-            android.R.id.home -> {
-                finish()
-                return true
-            }
-        }
-        return super.onOptionsItemSelected(item)
     }
 
     override fun onClickedScheduleDialogPositive(id: Int, title: String, comment: String) {
@@ -553,5 +496,17 @@ class DetailActivity :
         onProgressCompleted()
         Snackbar.make(detail_list, "ステップを開始できませんでした。", Snackbar.LENGTH_LONG)
             .setAction("OK") { detailViewModel.loadSchedule() }.show()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        return detailOptionsMenu.onCreateOptionsMenu(menu) { super.onCreateOptionsMenu(it) }
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
+        return detailOptionsMenu.onPrepareOptionsMenu(menu) { super.onPrepareOptionsMenu(menu) }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return detailOptionsMenu.onOptionsItemSelected(item) { super.onOptionsItemSelected(item) }
     }
 }
