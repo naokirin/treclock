@@ -54,7 +54,8 @@ class DetailViewModelTest: KoinTest {
     fun testLoad() {
         val list = listOf(Schedule(1, "a", "", mutableListOf(mock(Step::class.java))))
         given(repository.getSchedules()).willReturn(Single.just(list))
-        viewModel.loadSchedule(1)
+        viewModel.scheduleId = 1
+        viewModel.loadSchedule()
 
         val arg = ArgumentCaptor.forClass(ViewModelEvent::class.java)
         verify(view, times(2)).onChanged(arg.capture())

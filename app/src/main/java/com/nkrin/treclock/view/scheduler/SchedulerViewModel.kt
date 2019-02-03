@@ -1,6 +1,9 @@
 package com.nkrin.treclock.view.scheduler
 
+import android.arch.lifecycle.Lifecycle
+import android.arch.lifecycle.LifecycleObserver
 import android.arch.lifecycle.LiveData
+import android.arch.lifecycle.OnLifecycleEvent
 import com.nkrin.treclock.domain.entity.Schedule
 import com.nkrin.treclock.domain.repository.ScheduleRepository
 import com.nkrin.treclock.util.mvvm.BaseViewModel
@@ -17,7 +20,7 @@ import java.util.NoSuchElementException
 class SchedulerViewModel(
     private val schedulerProvider: SchedulerProvider,
     private val schedulerRepository: ScheduleRepository
-): BaseViewModel() {
+): BaseViewModel(), LifecycleObserver {
 
     private val _loadingEvents = SingleLiveEvent<ViewModelEvent>()
     val loadingEvents: LiveData<ViewModelEvent>
@@ -32,6 +35,11 @@ class SchedulerViewModel(
         get() = _removingEvents
 
     var list: MutableList<Schedule> = mutableListOf()
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
+    fun onResume() {
+        load()
+    }
 
     fun load() {
         _loadingEvents.value = Pending

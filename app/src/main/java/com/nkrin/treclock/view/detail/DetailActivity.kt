@@ -25,6 +25,7 @@ import com.nkrin.treclock.R
 import com.nkrin.treclock.domain.entity.Schedule
 import com.nkrin.treclock.domain.entity.Step
 import com.nkrin.treclock.util.mvvm.Error
+import com.nkrin.treclock.util.mvvm.Pending
 import com.nkrin.treclock.util.mvvm.Success
 import com.nkrin.treclock.util.time.TimeProvider
 import com.nkrin.treclock.view.alarm.Alarm
@@ -56,14 +57,18 @@ class DetailActivity :
     private var progressDialog: ProgressDialogFragment? = null
     private lateinit var detailList: RecyclerView
 
-    private var scheduleId: Int = 0
     private val playingStepsCallbacks: MutableMap<Int, () -> Unit> = mutableMapOf()
     private val stoppingStepsCallbacks: MutableMap<Int, () -> Unit> = mutableMapOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        lifecycle.addObserver(detailViewModel)
+
         setContentView(R.layout.activity_detail)
         setSupportActionBar(toolbar)
+
+        detailViewModel.scheduleId = intent?.getIntExtra("schedule_id", 0) ?: 0
 
         detailList = findViewById(R.id.detail_list)
         detailList.addItemDecoration(
@@ -76,6 +81,7 @@ class DetailActivity :
 
         detailViewModel.loadingEvents.observe(this, Observer {
             when (it) {
+                is Pending -> onPendingWithProgress("Loading...")
                 is Success -> onLoaded(it.value)
                 is Error -> onLoadedError()
             }
@@ -83,6 +89,7 @@ class DetailActivity :
 
         detailViewModel.addingEvents.observe(this, Observer {
             when (it) {
+                is Pending -> onPendingWithProgress("Saving...")
                 is Success -> onAdded(it.value)
                 is Error -> onAddedError()
             }
@@ -90,6 +97,7 @@ class DetailActivity :
 
         detailViewModel.removingEvents.observe(this, Observer {
             when (it) {
+                is Pending -> onPendingWithProgress("Saving...")
                 is Success -> onRemoved(it.value)
                 is Error -> onRemovedError()
             }
@@ -97,6 +105,7 @@ class DetailActivity :
 
         detailViewModel.updatingEvents.observe(this, Observer {
             when (it) {
+                is Pending -> onPendingWithProgress("Saving...")
                 is Success -> onUpdated(it.value)
                 is Error -> onUpdatedError()
             }
@@ -212,29 +221,21 @@ class DetailActivity :
     override fun onClickedYesNoDialogPositive(dialogId: String) {
         if (dialogId == "removing_schedule_dialog") {
             detailViewModel.removeSchedule()
-            progressDialog = ProgressDialogFragment.create("Deleting...")
-            progressDialog?.show(supportFragmentManager, null)
         }
     }
 
     private fun updateSchedule(title: String, comment: String) {
         detailViewModel.updateSchedule(title, comment)
-        progressDialog = ProgressDialogFragment.create("Saving...")
-        progressDialog?.show(supportFragmentManager, null)
     }
 
     private fun addNewStep(title: String, duration: Duration) {
         detailViewModel.addStep(title, duration)
-        progressDialog = ProgressDialogFragment.create("Saving...")
-        progressDialog?.show(supportFragmentManager, null)
     }
 
     private fun updateStep(id: Int, title: String, duration: Duration) {
         val adaptor = detailList.adapter
         if (adaptor is DetailRecycleViewAdapter) {
             detailViewModel.updateStep(id, title, duration)
-            progressDialog = ProgressDialogFragment.create("Saving...")
-            progressDialog?.show(supportFragmentManager, null)
         }
     }
 
@@ -242,8 +243,6 @@ class DetailActivity :
         val adapter = detailList.adapter
         if (adapter is DetailRecycleViewAdapter) {
             detailViewModel.removeStep(id)
-            progressDialog = ProgressDialogFragment.create("Saving...")
-            progressDialog?.show(supportFragmentManager, null)
         }
         playingStepsCallbacks.remove(id)
         stoppingStepsCallbacks.remove(id)
@@ -285,14 +284,23 @@ class DetailActivity :
                     alarmManager
                 )
 
-                AlarmPlayer.setUp("$scheduleId", alarm)
+                AlarmPlayer.setUp("${detailViewModel.schedule?.id}", alarm)
             }
         }
     }
 
     private fun stopAlarms() {
-        AlarmPlayer.cancel("$scheduleId")
+        AlarmPlayer.cancel("${detailViewModel.schedule?.id}")
         Notification().cancelAll(applicationContext)
+    }
+
+    private fun onPendingWithProgress(message: String) {
+        progressDialog = ProgressDialogFragment.create(message)
+        progressDialog?.show(supportFragmentManager, null)
+    }
+
+    private fun onProgressCompleted() {
+        progressDialog?.cancel()
     }
 
     private fun onLoaded(schedule: Any?) {
@@ -435,20 +443,20 @@ class DetailActivity :
                 }
             )
         }
-        progressDialog?.cancel()
+        onProgressCompleted()
     }
 
     private fun onLoadedError() {
-        progressDialog?.cancel()
+        onProgressCompleted()
         Snackbar.make(detail_list, "データが読み込めませんでした。再読込します。", Snackbar.LENGTH_LONG)
-            .setAction("OK") { detailViewModel.loadSchedule(scheduleId) }.show()
+            .setAction("OK") { detailViewModel.loadSchedule() }.show()
     }
 
     private fun onAdded(index: Any?) {
         if (index is Int) {
             if (index != -1) {
                 detailList.adapter?.notifyItemInserted(index)
-                progressDialog?.cancel()
+                onProgressCompleted()
                 Toast.makeText(this, "ステップを追加しました", Toast.LENGTH_SHORT)
                     .show()
                 return
@@ -458,16 +466,16 @@ class DetailActivity :
     }
 
     private fun onAddedError() {
-        progressDialog?.cancel()
+        onProgressCompleted()
         Snackbar.make(detail_list, "ステップを追加できませんでした。", Snackbar.LENGTH_LONG)
-            .setAction("OK") { detailViewModel.loadSchedule(scheduleId) }.show()
+            .setAction("OK") { detailViewModel.loadSchedule() }.show()
     }
 
     private fun onRemoved(index: Any?) {
         if (index is Int) {
             if (index != -1) {
                 detailList.adapter?.notifyItemRemoved(index)
-                progressDialog?.cancel()
+                onProgressCompleted()
                 Toast.makeText(this, "ステップを削除しました", Toast.LENGTH_SHORT)
                     .show()
                 return
@@ -477,22 +485,22 @@ class DetailActivity :
     }
 
     private fun onRemovedError() {
-        progressDialog?.cancel()
+        onProgressCompleted()
         Snackbar.make(detail_list, "ステップを削除できませんでした。", Snackbar.LENGTH_LONG)
-            .setAction("OK") { detailViewModel.loadSchedule(scheduleId) }.show()
+            .setAction("OK") { detailViewModel.loadSchedule() }.show()
     }
 
     private fun onUpdated(index: Any?) {
          if (index is Int) {
             if (index != -1) {
                 detailList.adapter?.notifyItemChanged(index)
-                progressDialog?.cancel()
+                onProgressCompleted()
                 Toast.makeText(this, "ステップを更新しました", Toast.LENGTH_SHORT)
                     .show()
                 return
             }
          } else if (index == null) {
-             progressDialog?.cancel()
+             onProgressCompleted()
              Toast.makeText(this, "スケジュールを更新しました", Toast.LENGTH_SHORT)
                  .show()
              return
@@ -501,13 +509,13 @@ class DetailActivity :
     }
 
     private fun onUpdatedError() {
-        progressDialog?.cancel()
+        onProgressCompleted()
         Snackbar.make(detail_list, "ステップを更新できませんでした。", Snackbar.LENGTH_LONG)
-            .setAction("OK") { detailViewModel.loadSchedule(scheduleId) }.show()
+            .setAction("OK") { detailViewModel.loadSchedule() }.show()
     }
 
     private fun onRemovedSchedule() {
-        progressDialog?.cancel()
+        onProgressCompleted()
         finish()
     }
 
@@ -524,7 +532,7 @@ class DetailActivity :
                 stoppingStepsCallbacks.forEach { _, callback -> callback() }
             }
         }
-        progressDialog?.cancel()
+        onProgressCompleted()
     }
 
     private fun onPlayedOrStoppedError() {
@@ -542,8 +550,8 @@ class DetailActivity :
     }
 
     private fun onPlayedStepError() {
+        onProgressCompleted()
         Snackbar.make(detail_list, "ステップを開始できませんでした。", Snackbar.LENGTH_LONG)
-            .setAction("OK") { detailViewModel.loadSchedule(scheduleId) }.show()
-        progressDialog?.cancel()
+            .setAction("OK") { detailViewModel.loadSchedule() }.show()
     }
 }

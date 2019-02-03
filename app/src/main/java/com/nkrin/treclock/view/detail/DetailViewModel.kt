@@ -1,6 +1,9 @@
 package com.nkrin.treclock.view.detail
 
+import android.arch.lifecycle.Lifecycle
+import android.arch.lifecycle.LifecycleObserver
 import android.arch.lifecycle.LiveData
+import android.arch.lifecycle.OnLifecycleEvent
 import com.nkrin.treclock.domain.entity.Schedule
 import com.nkrin.treclock.domain.entity.Step
 import com.nkrin.treclock.domain.repository.ScheduleRepository
@@ -17,7 +20,7 @@ class DetailViewModel(
     private val schedulerProvider: SchedulerProvider,
     private val timeProvider: TimeProvider,
     private val schedulerRepository: ScheduleRepository
-): BaseViewModel() {
+): BaseViewModel(), LifecycleObserver {
 
     private val _loadingEvents = SingleLiveEvent<ViewModelEvent>()
     val loadingEvents: LiveData<ViewModelEvent>
@@ -59,9 +62,20 @@ class DetailViewModel(
     val settingStepTimerEvents: LiveData<ViewModelEvent>
         get() = _settingStepTimerEvents
 
+    var scheduleId: Int = 0
     var schedule: Schedule? = null
 
-    fun loadSchedule(scheduleId: Int) {
+    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
+    fun onResume() {
+        loadSchedule()
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+    fun onPause() {
+        storeSchedule()
+    }
+
+    fun loadSchedule() {
         _loadingEvents.value = Pending
         launch {
             schedulerRepository.getSchedules()

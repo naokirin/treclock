@@ -36,6 +36,9 @@ class SchedulerActivity : AppCompatActivity(), NewScheduleDialogFragment.Listene
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        lifecycle.addObserver(schedulerViewModel)
+
         setContentView(R.layout.activity_scheduler)
         setSupportActionBar(toolbar)
         setTitle(R.string.title_activity_scheduler)
@@ -81,10 +84,9 @@ class SchedulerActivity : AppCompatActivity(), NewScheduleDialogFragment.Listene
     }
 
     override fun onResume() {
-        super.onResume()
         progressDialog = ProgressDialogFragment.create("Loading...")
         progressDialog?.show(supportFragmentManager, null)
-        schedulerViewModel.load()
+        super.onResume()
     }
 
     override fun onClickedScheduleDialogPositive(id: Int, title: String, comment: String) {
