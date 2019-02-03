@@ -143,7 +143,7 @@ class DetailActivity :
             Toast.makeText(this, "スケジュールを無名にはできません", Toast.LENGTH_SHORT)
                 .show()
         } else {
-            updateSchedule(title, comment)
+            detailViewModel.updateSchedule(title, comment)
         }
     }
     override fun onClickedStepDialogPositive(id: Int, title: String, duration: Duration?) {
@@ -153,40 +153,20 @@ class DetailActivity :
             duration == null || duration.isZero || duration.isNegative ->
                 Toast.makeText(this , "時間指定のないステップは作成できません", Toast.LENGTH_SHORT)
                     .show()
-            id == 0 -> addNewStep(title, duration)
-            else -> updateStep(id, title, duration)
+            id == 0 -> detailViewModel.addStep(title, duration)
+            else -> detailViewModel.updateStep(id, title, duration)
         }
     }
 
-    override fun onClickedYesNoDialogNegative(dialogId: String) {
-    }
-
+    override fun onClickedYesNoDialogNegative(dialogId: String) { }
     override fun onClickedYesNoDialogPositive(dialogId: String) {
         if (dialogId == "removing_schedule_dialog") {
             detailViewModel.removeSchedule()
         }
     }
 
-    private fun updateSchedule(title: String, comment: String) {
-        detailViewModel.updateSchedule(title, comment)
-    }
-
-    private fun addNewStep(title: String, duration: Duration) {
-        detailViewModel.addStep(title, duration)
-    }
-
-    private fun updateStep(id: Int, title: String, duration: Duration) {
-        val adaptor = detailList.adapter
-        if (adaptor is DetailRecycleViewAdapter) {
-            detailViewModel.updateStep(id, title, duration)
-        }
-    }
-
     private fun removeStep(id: Int) {
-        val adapter = detailList.adapter
-        if (adapter is DetailRecycleViewAdapter) {
-            detailViewModel.removeStep(id)
-        }
+        detailViewModel.removeStep(id)
         playingStepsCallbacks.remove(id)
         stoppingStepsCallbacks.remove(id)
     }
