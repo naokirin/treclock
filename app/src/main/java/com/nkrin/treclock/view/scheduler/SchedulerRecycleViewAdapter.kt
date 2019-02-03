@@ -12,8 +12,7 @@ import com.nkrin.treclock.util.time.TimeProvider
 class SchedulerRecycleViewAdapter(
     private val viewModel: SchedulerViewModel,
     private val timeProvider: TimeProvider,
-    private val rowListener: RowListener,
-    private val removingListener: RemovingListener
+    private val rowListener: RowListener
 ) : RecyclerView.Adapter<SchedulerViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SchedulerViewHolder {
@@ -28,18 +27,18 @@ class SchedulerRecycleViewAdapter(
         holder.detailView.text = item.comment
 
         if (item.played(timeProvider.now())) {
-            holder.removingButton.hide()
+            holder.actionButton.visibility = View.GONE
             holder.playingText.visibility = View.VISIBLE
         } else {
-            holder.removingButton.show()
+            holder.actionButton.visibility = View.VISIBLE
             holder.playingText.visibility = View.GONE
         }
 
         holder.itemView.setOnClickListener {
             rowListener.onClickRow(it, item)
         }
-        holder.removingButton.setOnClickListener {
-            removingListener.onClickRemoving(item)
+        holder.actionButton.setOnClickListener {
+            rowListener.onClickAction(it, item)
         }
     }
 
@@ -49,9 +48,6 @@ class SchedulerRecycleViewAdapter(
 
     interface RowListener {
         fun onClickRow(tappedView: View, schedule: Schedule)
-    }
-
-    interface RemovingListener {
-        fun onClickRemoving(schedule: Schedule)
+        fun onClickAction(tappedView: View, schedule: Schedule)
     }
 }

@@ -50,9 +50,10 @@
         <ImageButton
                 android:layout_height="28dp" app:srcCompat="@drawable/vertical_three_dots"
                 android:id="@+id/action_button"
-                android:layout_marginEnd="8dp" android:scaleType="fitCenter"
+                android:scaleType="fitCenter"
                 app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent" android:layout_width="24dp"
-                android:background="@android:color/transparent"/>
+                android:background="@android:color/transparent" android:layout_marginEnd="16dp"
+                app:layout_constraintStart_toEndOf="@+id/linearLayout" android:layout_marginStart="16dp"/>
     </android.support.constraint.ConstraintLayout>
 </LinearLayout>

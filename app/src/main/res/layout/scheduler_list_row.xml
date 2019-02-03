@@ -47,17 +47,17 @@
                     android:singleLine="true" android:textSize="18sp"/>
 
         </LinearLayout>
-        <android.support.design.widget.FloatingActionButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:clickable="true" app:srcCompat="@android:drawable/ic_delete"
+        <ImageButton
+                android:layout_width="24dp"
+                android:layout_height="28dp"
+                app:srcCompat="@drawable/vertical_three_dots"
+                android:id="@+id/action_button"
+                android:layout_weight="0.5"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginEnd="16dp"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:backgroundTint="@android:color/transparent"
-                android:layout_marginEnd="16dp" android:id="@+id/action_button" app:backgroundTintMode="src_in"
-                app:fabSize="mini" android:visibility="visible"
-        />
+                android:scaleType="fitCenter" android:background="@android:color/transparent"/>
         <TextView
                 android:text="Playing"
                 android:layout_width="wrap_content"

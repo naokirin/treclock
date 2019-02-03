@@ -395,10 +395,13 @@ class DetailActivity :
                     }
 
                     override fun onSwiped(viewHolder: ViewHolder, direction: Int) {
+                        val s = detailViewModel.schedule
+                        if (s != null && s.played(timeProvider.now())) {
+                            return
+                        }
                         val fromPos = viewHolder.adapterPosition
                         val steps = detailViewModel.schedule?.steps
-                        if (steps != null) {
-                            if (steps.size > fromPos)
+                        if (steps != null && steps.size > fromPos) {
                             removeStep(steps[fromPos].id)
                         }
                     }
