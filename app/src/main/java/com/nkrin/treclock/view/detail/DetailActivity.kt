@@ -3,7 +3,6 @@ package com.nkrin.treclock.view.detail
 import android.app.AlarmManager
 import android.arch.lifecycle.Observer
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.Snackbar
@@ -28,16 +27,12 @@ import com.nkrin.treclock.util.mvvm.Error
 import com.nkrin.treclock.util.mvvm.Pending
 import com.nkrin.treclock.util.mvvm.Success
 import com.nkrin.treclock.util.time.TimeProvider
-import com.nkrin.treclock.view.alarm.Alarm
-import com.nkrin.treclock.view.alarm.AlarmPlayer
-import com.nkrin.treclock.view.notification.Notification
-import com.nkrin.treclock.view.notification.NotificationReceiver
+import com.nkrin.treclock.view.detail.dialog.NewStepDialogFragment
 import com.nkrin.treclock.view.scheduler.DetailRecycleViewAdapter
 import com.nkrin.treclock.view.scheduler.DetailViewHolder
 import com.nkrin.treclock.view.util.BackgroundItemDecoration
-import com.nkrin.treclock.view.util.dialog.ProgressDialogFragment
 import com.nkrin.treclock.view.util.dialog.NewScheduleDialogFragment
-import com.nkrin.treclock.view.detail.dialog.NewStepDialogFragment
+import com.nkrin.treclock.view.util.dialog.ProgressDialogFragment
 import com.nkrin.treclock.view.util.dialog.YesNoDialogFragment
 import kotlinx.android.synthetic.main.activity_detail.*
 import kotlinx.android.synthetic.main.content_detail.*
@@ -45,7 +40,6 @@ import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.viewModel
 import java.time.Duration
 import java.time.OffsetDateTime
-import java.time.format.DateTimeFormatter
 
 
 class DetailActivity :
@@ -57,6 +51,7 @@ class DetailActivity :
     private var progressDialog: ProgressDialogFragment? = null
     private lateinit var detailList: RecyclerView
     private lateinit var detailOptionsMenu: DetailOptionsMenu
+    private lateinit var detailAlarmManager: DetailAlarmManager
 
     private val playingStepsCallbacks: MutableMap<Int, () -> Unit> = mutableMapOf()
     private val stoppingStepsCallbacks: MutableMap<Int, () -> Unit> = mutableMapOf()
@@ -66,6 +61,12 @@ class DetailActivity :
 
         lifecycle.addObserver(detailViewModel)
         detailOptionsMenu = DetailOptionsMenu(this, detailViewModel, timeProvider)
+        detailAlarmManager = DetailAlarmManager(
+            detailViewModel,
+            getSystemService(Context.ALARM_SERVICE) as AlarmManager,
+            timeProvider,
+            applicationContext
+        )
 
         setContentView(R.layout.activity_detail)
         setSupportActionBar(toolbar)
@@ -132,8 +133,11 @@ class DetailActivity :
         })
 
         detailViewModel.settingStepTimerEvents.observe(this, Observer {
-            if (it is Success) {
-                setAlarm(it.value)
+            if (it is Success && it.value is Triple<*, *, *>) {
+                val title = it.value.first
+                val duration = it.value.second as Duration
+                val actualStart = it.value.third as OffsetDateTime
+                if (title is String) detailAlarmManager.setAlarm(title, duration, actualStart)
             }
         })
     }
@@ -171,51 +175,6 @@ class DetailActivity :
         stoppingStepsCallbacks.remove(id)
     }
 
-    private fun setAlarm(param: Any?) {
-        if (param is Triple<*, *, *>) {
-            val title = param.first
-            val duration = param.second
-            val actualStart = param.third
-
-            val intentSetup = { intent: Intent ->
-                with(intent) {
-                    if (title is String && duration is Duration && actualStart is OffsetDateTime) {
-                        val formatter = DateTimeFormatter.ofPattern("HH:mm")
-                        val endMessage = formatter.format(actualStart + duration)
-                        putExtra(
-                            "message", "〜${endMessage}"
-                        )
-                    } else if (title is String && duration == null) {
-                        putExtra("message", title)
-                    }
-                    putExtra(
-                        "title",
-                        "$title [${detailViewModel.schedule?.name ?: ""}]"
-                    )
-                }
-            }
-            val alarmManager = getSystemService(Context.ALARM_SERVICE)
-            if (alarmManager is AlarmManager) {
-                val alarm = Alarm(
-                    AlarmPlayer.createNewRequestCode(),
-                    actualStart as OffsetDateTime,
-                    timeProvider.now(),
-                    Notification()::notify,
-                    intentSetup,
-                    applicationContext,
-                    NotificationReceiver::class.java,
-                    alarmManager
-                )
-
-                AlarmPlayer.setUp("${detailViewModel.schedule?.id}", alarm)
-            }
-        }
-    }
-
-    private fun stopAlarms() {
-        AlarmPlayer.cancel("${detailViewModel.schedule?.id}")
-        Notification().cancelAll(applicationContext)
-    }
 
     private fun onPendingWithProgress(message: String) {
         progressDialog = ProgressDialogFragment.create(message)
@@ -224,6 +183,12 @@ class DetailActivity :
 
     private fun onProgressCompleted() {
         progressDialog?.cancel()
+    }
+
+    private fun onErrorWithRetrySnackbar(message: String) {
+        onProgressCompleted()
+        Snackbar.make(detail_list, message, Snackbar.LENGTH_LONG)
+            .setAction("OK") { detailViewModel.loadSchedule() }.show()
     }
 
     private fun onLoaded(schedule: Any?) {
@@ -351,7 +316,7 @@ class DetailActivity :
             }
 
             stop_button.setOnClickListener {
-                stopAlarms()
+                detailAlarmManager.stopAllAlarms()
                 detailViewModel.stopSchedule()
             }
 
@@ -369,11 +334,7 @@ class DetailActivity :
         onProgressCompleted()
     }
 
-    private fun onLoadedError() {
-        onProgressCompleted()
-        Snackbar.make(detail_list, "データが読み込めませんでした。再読込します。", Snackbar.LENGTH_LONG)
-            .setAction("OK") { detailViewModel.loadSchedule() }.show()
-    }
+    private fun onLoadedError() = onErrorWithRetrySnackbar("データが読み込めませんでした。再読込します。")
 
     private fun onAdded(index: Any?) {
         if (index is Int) {
@@ -388,11 +349,7 @@ class DetailActivity :
         onAddedError()
     }
 
-    private fun onAddedError() {
-        onProgressCompleted()
-        Snackbar.make(detail_list, "ステップを追加できませんでした。", Snackbar.LENGTH_LONG)
-            .setAction("OK") { detailViewModel.loadSchedule() }.show()
-    }
+    private fun onAddedError() = onErrorWithRetrySnackbar("ステップを追加できませんでした。")
 
     private fun onRemoved(index: Any?) {
         if (index is Int) {
@@ -407,11 +364,7 @@ class DetailActivity :
         onAddedError()
     }
 
-    private fun onRemovedError() {
-        onProgressCompleted()
-        Snackbar.make(detail_list, "ステップを削除できませんでした。", Snackbar.LENGTH_LONG)
-            .setAction("OK") { detailViewModel.loadSchedule() }.show()
-    }
+    private fun onRemovedError() = onErrorWithRetrySnackbar("ステップを削除できませんでした。")
 
     private fun onUpdated(index: Any?) {
          if (index is Int) {
@@ -431,11 +384,7 @@ class DetailActivity :
         onUpdatedError()
     }
 
-    private fun onUpdatedError() {
-        onProgressCompleted()
-        Snackbar.make(detail_list, "ステップを更新できませんでした。", Snackbar.LENGTH_LONG)
-            .setAction("OK") { detailViewModel.loadSchedule() }.show()
-    }
+    private fun onUpdatedError() = onErrorWithRetrySnackbar("ステップを更新できませんでした。")
 
     private fun onRemovedSchedule() {
         onProgressCompleted()
@@ -472,11 +421,7 @@ class DetailActivity :
         }
     }
 
-    private fun onPlayedStepError() {
-        onProgressCompleted()
-        Snackbar.make(detail_list, "ステップを開始できませんでした。", Snackbar.LENGTH_LONG)
-            .setAction("OK") { detailViewModel.loadSchedule() }.show()
-    }
+    private fun onPlayedStepError() = onErrorWithRetrySnackbar("ステップを開始できませんでした。")
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         return detailOptionsMenu.onCreateOptionsMenu(menu) { super.onCreateOptionsMenu(it) }
