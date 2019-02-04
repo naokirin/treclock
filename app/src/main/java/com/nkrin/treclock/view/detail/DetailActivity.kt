@@ -35,9 +35,9 @@ import com.nkrin.treclock.view.notification.NotificationReceiver
 import com.nkrin.treclock.view.scheduler.DetailRecycleViewAdapter
 import com.nkrin.treclock.view.scheduler.DetailViewHolder
 import com.nkrin.treclock.view.util.BackgroundItemDecoration
-import com.nkrin.treclock.view.util.ProgressDialogFragment
+import com.nkrin.treclock.view.util.dialog.ProgressDialogFragment
 import com.nkrin.treclock.view.util.dialog.NewScheduleDialogFragment
-import com.nkrin.treclock.view.util.dialog.NewStepDialogFragment
+import com.nkrin.treclock.view.detail.dialog.NewStepDialogFragment
 import com.nkrin.treclock.view.util.dialog.YesNoDialogFragment
 import kotlinx.android.synthetic.main.activity_detail.*
 import kotlinx.android.synthetic.main.content_detail.*

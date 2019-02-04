@@ -20,7 +20,7 @@ import com.nkrin.treclock.util.time.TimeProvider
 import com.nkrin.treclock.view.detail.DetailActivity
 import com.nkrin.treclock.view.util.dialog.NewScheduleDialogFragment
 import com.nkrin.treclock.view.util.BackgroundItemDecoration
-import com.nkrin.treclock.view.util.ProgressDialogFragment
+import com.nkrin.treclock.view.util.dialog.ProgressDialogFragment
 import kotlinx.android.synthetic.main.activity_scheduler.*
 import org.jetbrains.anko.intentFor
 import org.koin.android.ext.android.inject

@@ -18,4 +18,6 @@
     <string name="menu_detail_item_delete">削除</string>
     <string name="menu_detail_item_play">ここから再生</string>
     <string name="menu_scheduler_item_delete">削除</string>
+    <string name="yes_button">はい</string>
+    <string name="no_button">いいえ</string>
 </resources>

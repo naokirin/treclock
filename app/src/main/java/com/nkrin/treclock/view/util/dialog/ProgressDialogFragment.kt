@@ -1,12 +1,15 @@
-package com.nkrin.treclock.view.util
+package com.nkrin.treclock.view.util.dialog
 
 import android.app.AlertDialog
 import android.app.Dialog
+import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.v4.app.DialogFragment
+import android.view.LayoutInflater
 import android.widget.ProgressBar
 import android.widget.TextView
 import com.nkrin.treclock.R
+import com.nkrin.treclock.databinding.FragmentProgressDialogBinding
 import io.reactivex.Completable
 import java.util.concurrent.TimeUnit
 
@@ -14,16 +17,24 @@ import java.util.concurrent.TimeUnit
 class ProgressDialogFragment: DialogFragment() {
 
     private var progressBar: ProgressBar? = null
-    private var progressMessage: TextView? = null
     private var startedTime: Long = 0
     private var showing = false
 
     private var message: String = ""
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val inflater = LayoutInflater.from(activity)
+        val binding = DataBindingUtil.inflate<FragmentProgressDialogBinding>(
+            inflater, R.layout.fragment_progress_dialog, null, false)
+
+        val args = arguments
+        if (args != null) {
+            message = args.getString("message", "")
+        }
+        binding.message = message
+
         val builder = AlertDialog.Builder(activity)
-        val inflater = activity?.layoutInflater
-        builder.setView(inflater?.inflate(R.layout.fragment_progress_dialog, null))
+        builder.setView(binding.root)
         return builder.create()
     }
 
@@ -32,8 +43,6 @@ class ProgressDialogFragment: DialogFragment() {
         showing = true
         startedTime = System.currentTimeMillis()
         progressBar = dialog.findViewById(R.id.progress)
-        progressMessage = dialog.findViewById(R.id.progress_message)
-        setMessage(message)
     }
 
     fun cancel() {
@@ -66,23 +75,14 @@ class ProgressDialogFragment: DialogFragment() {
         showing = false
     }
 
-    fun setMessage(m: String) {
-        if (!showing) {
-            message = m
-        } else {
-            if (progressMessage == null) {
-                progressMessage = dialog.findViewById(R.id.progress_message)
-            }
-            progressMessage?.text = m
-        }
-    }
-
     companion object {
         private const val SHOW_MIN_MILLISECOND = 500L
 
         fun create(message: String): ProgressDialogFragment {
             val dialog = ProgressDialogFragment()
-            dialog.setMessage(message)
+            val args = Bundle()
+            args.putString("message", message)
+            dialog.arguments = args
             return dialog
         }
     }

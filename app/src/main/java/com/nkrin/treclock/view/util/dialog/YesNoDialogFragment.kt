@@ -2,28 +2,35 @@ package com.nkrin.treclock.view.util.dialog
 
 import android.app.AlertDialog
 import android.app.Dialog
+import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.v4.app.DialogFragment
-import android.widget.TextView
+import android.view.LayoutInflater
 import com.nkrin.treclock.R
+import com.nkrin.treclock.databinding.FragmentYesNoDialogBinding
 
 class YesNoDialogFragment : DialogFragment() {
+
     override fun onCreateDialog(savedInstanceState: Bundle?) : Dialog {
-        val builder = AlertDialog.Builder(activity)
-        val inflater = activity?.layoutInflater
-        val view = inflater?.inflate(R.layout.fragment_yes_no_dialog, null)
-        val messageView = view?.findViewById<TextView>(R.id.yes_no_dialog_message)
 
         var dialogId = ""
-        var yesMessage = ""
-        var noMessage = ""
+        var message = ""
+        var yesMessage = getString(R.string.yes_button)
+        var noMessage = getString(R.string.no_button)
         val args = arguments
         if (args != null) {
             dialogId = args.getString("dialog_id", "")
-            messageView?.setText(args.getString("message", ""), TextView.BufferType.NORMAL)
-            yesMessage = args.getString("yes_message", "はい")
-            noMessage = args.getString("no_message", "いいえ")
+            message = args.getString("message", "")
+            yesMessage = args.getString("yes_message", yesMessage)
+            noMessage = args.getString("no_message", noMessage)
         }
+
+        val builder = AlertDialog.Builder(activity)
+        val inflater = LayoutInflater.from(activity)
+        val binding = DataBindingUtil.inflate<FragmentYesNoDialogBinding>(
+            inflater, R.layout.fragment_yes_no_dialog, null, false)
+        val view = binding.root
+        binding.message = message
 
         builder.setView(view)
             .setPositiveButton(yesMessage) { _, _ ->

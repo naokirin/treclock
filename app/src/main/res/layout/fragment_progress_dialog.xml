@@ -1,33 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
+<layout
         xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-
-    <ProgressBar
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@+id/progress"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_gravity="center"
-            android:layout_marginLeft="16dp"
-            android:layout_marginTop="16dp"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            android:layout_marginBottom="16dp"
-            android:indeterminate="true"
-            android:indeterminateTintMode="src_in"
-            android:indeterminateTint="@color/colorPrimary"/>
-
-    <TextView
-            android:id="@+id/progress_message"
+        xmlns:app="http://schemas.android.com/apk/res-auto" >
+    <data>
+        <variable name="message" type="String" />
+    </data>
+    <android.support.constraint.ConstraintLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
-            app:layout_constraintBottom_toBottomOf="@+id/progress"
-            app:layout_constraintLeft_toRightOf="@+id/progress"
-            app:layout_constraintTop_toTopOf="@+id/progress"
-            app:layout_constraintVertical_bias="0.507" android:textAppearance="@style/TextAppearance.AppCompat"/>
-</android.support.constraint.ConstraintLayout>
+            android:layout_height="wrap_content">
+
+        <ProgressBar
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/progress"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_gravity="center"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="16dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_marginBottom="16dp"
+                android:indeterminate="true"
+                android:indeterminateTintMode="src_in"
+                android:indeterminateTint="@color/colorPrimary"/>
+
+        <TextView
+                android:id="@+id/progress_message"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                app:layout_constraintBottom_toBottomOf="@+id/progress"
+                app:layout_constraintLeft_toRightOf="@+id/progress"
+                app:layout_constraintTop_toTopOf="@+id/progress"
+                app:layout_constraintVertical_bias="0.507"
+                android:textAppearance="@style/TextAppearance.AppCompat"
+                android:text="@{message}"/>
+    </android.support.constraint.ConstraintLayout>
+</layout>
