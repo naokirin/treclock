@@ -34,6 +34,7 @@ import com.nkrin.treclock.view.util.dialog.ProgressDialogFragment
 import com.nkrin.treclock.view.util.dialog.YesNoDialogFragment
 import kotlinx.android.synthetic.main.activity_detail.*
 import kotlinx.android.synthetic.main.content_detail.*
+import org.jetbrains.anko.find
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.viewModel
 import java.time.Duration
@@ -71,12 +72,12 @@ class DetailActivity :
 
         detailViewModel.scheduleId = intent?.getIntExtra("schedule_id", 0) ?: 0
 
-        detailList = findViewById(R.id.detail_list)
+        detailList = detail_list
         detailList.addItemDecoration(
             BackgroundItemDecoration(R.drawable.item_grey_background, R.drawable.item_white_background)
         )
 
-        val toolbar = findViewById<Toolbar>(R.id.toolbar)
+        val toolbar = toolbar as Toolbar
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
@@ -133,8 +134,8 @@ class DetailActivity :
         detailViewModel.settingStepTimerEvents.observe(this, Observer {
             if (it is Success && it.value is Triple<*, *, *>) {
                 val title = it.value.first
-                val duration = it.value.second as Duration
-                val actualStart = it.value.third as OffsetDateTime
+                val duration = it.value.second as? Duration
+                val actualStart = it.value.third as? OffsetDateTime
                 if (title is String) detailAlarmManager.setAlarm(title, duration, actualStart)
             }
         })
@@ -204,12 +205,12 @@ class DetailActivity :
                 override fun onBindRow(holder: DetailViewHolder, tappedView: View, step: Step) {
                     playingStepsCallbacks[step.id] = {
                         val anim = AnimationUtils.loadAnimation(this@DetailActivity, R.anim.repeated_blinking_animation)
-                        val image = tappedView.findViewById<ImageView>(R.id.detail_list_row_icon)
+                        val image = tappedView.find<ImageView>(R.id.detail_list_row_icon)
                         image.startAnimation(anim)
                     }
 
                     stoppingStepsCallbacks[step.id] = {
-                        val image = tappedView.findViewById<ImageView>(R.id.detail_list_row_icon)
+                        val image = tappedView.find<ImageView>(R.id.detail_list_row_icon)
                         image.clearAnimation()
                         image.animate().cancel()
                         image.animation = null
@@ -390,8 +391,8 @@ class DetailActivity :
     }
 
     private fun onPlayedOrStopped(playing: Any?) {
-        val play = findViewById<FloatingActionButton>(R.id.play_button)
-        val stop = findViewById<FloatingActionButton>(R.id.stop_button)
+        val play = play_button as FloatingActionButton
+        val stop = stop_button as FloatingActionButton
         if (playing is Boolean) {
             if (playing) {
                 play.hide()

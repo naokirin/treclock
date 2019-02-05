@@ -11,6 +11,7 @@ import com.nkrin.treclock.R
 import com.nkrin.treclock.databinding.FragmentProgressDialogBinding
 import com.nkrin.treclock.util.rx.RxLauncher
 import io.reactivex.Completable
+import org.jetbrains.anko.find
 import java.util.concurrent.TimeUnit
 
 
@@ -43,7 +44,7 @@ class ProgressDialogFragment: DialogFragment() {
         super.onStart()
         showing = true
         startedTime = System.currentTimeMillis()
-        progressBar = dialog.findViewById(R.id.progress)
+        progressBar = dialog.find(R.id.progress)
     }
 
     fun cancel() {

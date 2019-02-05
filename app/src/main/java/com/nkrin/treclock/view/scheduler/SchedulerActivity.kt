@@ -22,6 +22,7 @@ import com.nkrin.treclock.view.util.dialog.NewScheduleDialogFragment
 import com.nkrin.treclock.view.util.BackgroundItemDecoration
 import com.nkrin.treclock.view.util.dialog.ProgressDialogFragment
 import kotlinx.android.synthetic.main.activity_scheduler.*
+import kotlinx.android.synthetic.main.content_scheduler.*
 import org.jetbrains.anko.intentFor
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.viewModel
@@ -43,7 +44,7 @@ class SchedulerActivity : AppCompatActivity(), NewScheduleDialogFragment.Listene
         setSupportActionBar(toolbar)
         setTitle(R.string.title_activity_scheduler)
 
-        schedulerList = findViewById(R.id.scheduler_list)
+        schedulerList = scheduler_list
         schedulerList.addItemDecoration(
             BackgroundItemDecoration(
                 R.drawable.item_grey_background,

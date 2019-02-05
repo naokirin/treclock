@@ -5,11 +5,12 @@ import android.view.View
 import android.widget.ImageButton
 import android.widget.TextView
 import com.nkrin.treclock.R
+import org.jetbrains.anko.find
 
 
 class DetailViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-    var titleView: TextView = itemView.findViewById(R.id.title)
-    var durationView: TextView = itemView.findViewById(R.id.duration)
-    var actionButton: ImageButton = itemView.findViewById(R.id.action_button)
+    var titleView: TextView = itemView.find(R.id.title)
+    var durationView: TextView = itemView.find(R.id.duration)
+    var actionButton: ImageButton = itemView.find(R.id.action_button)
 }
