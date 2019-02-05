@@ -11,23 +11,25 @@
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:theme="@style/AppTheme" android:fullBackupContent="@xml/backup_descriptor">
-        <activity android:name=".view.splash.SplashActivity">
+        <activity android:name=".view.splash.SplashActivity"
+                  android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
-
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
         <activity
                 android:name=".view.scheduler.SchedulerActivity"
                 android:label="@string/title_activity_scheduler"
-                android:theme="@style/AppTheme">
+                android:theme="@style/AppTheme"
+                android:screenOrientation="portrait">
         </activity>
         <activity
                 android:name=".view.detail.DetailActivity"
                 android:label="@string/title_activity_detail"
                 android:theme="@style/AppTheme"
-                android:parentActivityName=".view.scheduler.SchedulerActivity">
+                android:parentActivityName=".view.scheduler.SchedulerActivity"
+                android:screenOrientation="portrait">
         </activity>
         <receiver
                 android:name=".view.notification.NotificationReceiver"
