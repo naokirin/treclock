@@ -2,14 +2,9 @@
     <string name="app_name">Treclock</string>
     <string name="splashText">Treclock</string>
     <string name="title_activity_scheduler">Schedules</string>
-    <string name="action_settings">Settings</string>
     <string name="schedule_title">スケジュール名</string>
     <string name="schedule_dialog_title">スケジュール名</string>
-    <string name="schedule_dialog_comment">コメント</string>
     <string name="title_activity_detail">DetailActivity</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="scheduler_dialog_comment">コメント</string>
     <string name="menu_detail_edit">編集</string>
     <string name="menu_detail_delete">削除</string>
@@ -20,4 +15,9 @@
     <string name="menu_scheduler_item_delete">削除</string>
     <string name="yes_button">はい</string>
     <string name="no_button">いいえ</string>
+    <string name="splash_image_description">splash_image</string>
+    <string name="icon">icon</string>
+    <string name="action_description">action</string>
+    <string name="playing_text">Playing</string>
+    <string name="minutes_text">分</string>
 </resources>

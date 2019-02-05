@@ -6,15 +6,11 @@ import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.OnLifecycleEvent
 import com.nkrin.treclock.domain.entity.Schedule
 import com.nkrin.treclock.domain.repository.ScheduleRepository
-import com.nkrin.treclock.util.mvvm.BaseViewModel
-import com.nkrin.treclock.util.mvvm.SingleLiveEvent
 import com.nkrin.treclock.util.mvvm.*
-import com.nkrin.treclock.util.mvvm.ViewModelEvent
 import com.nkrin.treclock.util.rx.SchedulerProvider
 import com.nkrin.treclock.util.rx.fromIo
 import com.nkrin.treclock.util.rx.toUi
-import io.reactivex.Completable
-import java.util.NoSuchElementException
+import java.util.*
 
 
 class SchedulerViewModel(

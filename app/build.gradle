@@ -41,6 +41,12 @@ android {
     dataBinding {
         enabled = true
     }
+
+
+    lintOptions {
+        disable 'GoogleAppIndexingWarning'
+        baseline file('app/lint.xml')
+    }
 }
 
 dependencies {
@@ -75,3 +81,4 @@ dependencies {
     implementation 'io.reactivex.rxjava2:rxandroid:2.0.2'
 
 }
+

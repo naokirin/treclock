@@ -28,8 +28,6 @@ import com.nkrin.treclock.util.mvvm.Pending
 import com.nkrin.treclock.util.mvvm.Success
 import com.nkrin.treclock.util.time.TimeProvider
 import com.nkrin.treclock.view.detail.dialog.NewStepDialogFragment
-import com.nkrin.treclock.view.scheduler.DetailRecycleViewAdapter
-import com.nkrin.treclock.view.scheduler.DetailViewHolder
 import com.nkrin.treclock.view.util.BackgroundItemDecoration
 import com.nkrin.treclock.view.util.dialog.NewScheduleDialogFragment
 import com.nkrin.treclock.view.util.dialog.ProgressDialogFragment

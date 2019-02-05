@@ -1,7 +1,5 @@
-package com.nkrin.treclock.view.scheduler
+package com.nkrin.treclock.view.detail
 
-import android.arch.lifecycle.LifecycleOwner
-import android.arch.lifecycle.LifecycleRegistry
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.widget.ImageButton

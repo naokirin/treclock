@@ -5,16 +5,17 @@ import com.nkrin.treclock.data.room.ScheduleDao
 import com.nkrin.treclock.data.room.ScheduleDatabase
 import com.nkrin.treclock.data.room.ScheduleEntity
 import com.nkrin.treclock.data.room.StepEntity
-import org.junit.*
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
+import org.junit.Before
+import org.junit.Test
 import org.junit.runner.RunWith
 import org.koin.standalone.StandAloneContext.loadKoinModules
 import org.koin.standalone.StandAloneContext.stopKoin
 import org.koin.standalone.inject
 import org.koin.test.KoinTest
 import java.time.Duration
-import java.time.OffsetDateTime
 
 @RunWith(AndroidJUnit4::class)
 class ScheduleDaoTest : KoinTest {
@@ -132,7 +133,7 @@ class ScheduleDaoTest : KoinTest {
         scheduleDao.insertSchedules(entities)
         scheduleDao.insertSteps(stepEntities)
 
-        val updated = entities.map { it.also { it.comment = "updated" } }
+        val updated = entities.map { entity -> entity.also { it.comment = "updated" } }
         scheduleDao.updateSchedules(updated)
 
         val requestedEntities = scheduleDao.loadScheduleAndSteps().blockingGet()
@@ -147,7 +148,7 @@ class ScheduleDaoTest : KoinTest {
         scheduleDao.insertSchedules(entities)
         scheduleDao.insertSteps(stepEntities)
 
-        val updated = stepEntities.map { it.also { it.title = "updated" } }
+        val updated = stepEntities.map { entity -> entity.also { it.title = "updated" } }
         scheduleDao.updateSteps(updated)
 
         val requestedEntities = scheduleDao.loadScheduleAndSteps().blockingGet()
@@ -163,7 +164,7 @@ class ScheduleDaoTest : KoinTest {
         scheduleDao.insertSteps(stepEntities)
 
         val inserted = ScheduleEntity(3, "test3", "comment3")
-        val updated = entities.map { it.also { it.comment = "updated" } }
+        val updated = entities.map { entity -> entity.also { it.comment = "updated" } }
         val expected = updated + inserted
         scheduleDao.upsertSchedules(expected)
 

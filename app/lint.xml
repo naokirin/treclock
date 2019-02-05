@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+    <issue id="UnusedResources">
+        <ignore path="src/main/res/drawable/splash_back1.jpg" />
+        <ignore path="src/main/res/drawable/splash_back2.jpg" />
+        <ignore path="src/main/res/drawable/splash_back3.jpg" />
+        <ignore path="src/main/res/drawable/splash_back4.jpg" />
+        <ignore path="src/main/res/drawable/splash_back5.jpg" />
+        <ignore path="src/main/res/drawable/splash_back6.jpg" />
+        <ignore path="src/main/res/drawable/splash_back7.jpg" />
+        <ignore path="src/main/res/drawable/splash_back8.jpg" />
+        <ignore path="src/main/res/drawable/splash_back9.jpg" />
+        <ignore path="src/main/res/raw/ic_media_stop.png" />
+        <ignore path="src/main/res/raw/splash_back1.jpg" />
+        <ignore path="src/main/res/raw/splash_back2.jpg" />
+        <ignore path="src/main/res/raw/splash_back3.jpg" />
+        <ignore path="src/main/res/raw/splash_back4.jpg" />
+        <ignore path="src/main/res/raw/splash_back5.jpg" />
+        <ignore path="src/main/res/raw/splash_back6.jpg" />
+        <ignore path="src/main/res/raw/splash_back7.jpg" />
+        <ignore path="src/main/res/raw/splash_back8.jpg" />
+        <ignore path="src/main/res/raw/splash_back9.jpg" />
+        <ignore path="src/main/res/raw/vertical_three_dots.png" />
+    </issue>
+</lint>

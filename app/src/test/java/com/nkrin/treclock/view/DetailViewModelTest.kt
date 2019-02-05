@@ -25,7 +25,7 @@ import org.mockito.Mockito.*
 import java.time.Duration
 
 class DetailViewModelTest: KoinTest {
-    lateinit var viewModel: DetailViewModel
+    private lateinit var viewModel: DetailViewModel
 
     @Mock
     lateinit var view: Observer<ViewModelEvent>

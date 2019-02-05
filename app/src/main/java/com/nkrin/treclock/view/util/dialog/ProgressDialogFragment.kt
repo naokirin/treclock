@@ -7,15 +7,16 @@ import android.os.Bundle
 import android.support.v4.app.DialogFragment
 import android.view.LayoutInflater
 import android.widget.ProgressBar
-import android.widget.TextView
 import com.nkrin.treclock.R
 import com.nkrin.treclock.databinding.FragmentProgressDialogBinding
+import com.nkrin.treclock.util.rx.RxLauncher
 import io.reactivex.Completable
 import java.util.concurrent.TimeUnit
 
 
 class ProgressDialogFragment: DialogFragment() {
 
+    private val rxLauncher = RxLauncher()
     private var progressBar: ProgressBar? = null
     private var startedTime: Long = 0
     private var showing = false
@@ -58,21 +59,30 @@ class ProgressDialogFragment: DialogFragment() {
     private fun cancelWhenShowing() {
         val delayedTime = startedTime + SHOW_MIN_MILLISECOND - System.currentTimeMillis()
         if (delayedTime > 0) {
-            Completable.timer(delayedTime, TimeUnit.MILLISECONDS)
-                .subscribe { finish() }
+            rxLauncher.launch {
+                Completable.timer(delayedTime, TimeUnit.MILLISECONDS)
+                    .subscribe { finish() }
+            }
         } else {
             finish()
         }
     }
 
     private fun cancelWhenNotShowing() {
-        Completable.timer(SHOW_MIN_MILLISECOND, TimeUnit.MILLISECONDS)
-            .subscribe { finish() }
+        rxLauncher.launch {
+            Completable.timer(SHOW_MIN_MILLISECOND, TimeUnit.MILLISECONDS)
+                .subscribe { finish() }
+        }
     }
 
     private fun finish() {
         dismissAllowingStateLoss()
         showing = false
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        rxLauncher.dispose()
     }
 
     companion object {

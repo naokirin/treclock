@@ -2,7 +2,6 @@ package com.nkrin.treclock.view.util
 
 import android.graphics.Rect
 import android.support.v7.widget.RecyclerView
-import android.support.annotation.DrawableRes
 import android.view.View
 
 

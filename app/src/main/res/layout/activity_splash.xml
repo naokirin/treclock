@@ -13,7 +13,8 @@
             android:layout_height="0dp" app:srcCompat="@android:color/background_dark"
             android:id="@+id/splash_back" app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent" app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent" android:scaleType="centerCrop"/>
+            app:layout_constraintStart_toStartOf="parent" android:scaleType="centerCrop"
+            android:contentDescription="@string/splash_image_description"/>
     <TextView
             android:id="@+id/splashIcon"
             android:layout_width="0dp"

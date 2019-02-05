@@ -25,7 +25,7 @@ class DetailAlarmManager(
                     val formatter = DateTimeFormatter.ofPattern("HH:mm")
                     val endMessage = formatter.format(actualStart + duration)
                     putExtra(
-                        "message", "〜${endMessage}"
+                        "message", "〜$endMessage"
                     )
                 } else if (duration == null) {
                     putExtra("message", title)

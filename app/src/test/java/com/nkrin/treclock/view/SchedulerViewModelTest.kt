@@ -22,7 +22,7 @@ import org.mockito.BDDMockito.given
 import org.mockito.Mockito.*
 
 class SchedulerViewModelTest: KoinTest {
-    lateinit var viewModel: SchedulerViewModel
+    private lateinit var viewModel: SchedulerViewModel
 
     @Mock
     lateinit var view: Observer<ViewModelEvent>

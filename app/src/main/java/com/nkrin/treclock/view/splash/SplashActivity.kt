@@ -38,7 +38,7 @@ class SplashActivity : AppCompatActivity() {
 
     private fun showLoading() {
         val background = findViewById<ImageView>(R.id.splash_back)
-        val id = resources.getIdentifier("splash_back${(1..9).random()}", "drawable", packageName)
+        val id = resources.getIdentifier("splash_back${(1..9).random()}", "raw", packageName)
         background.setImageResource(id)
         val animation =
             AnimationUtils.loadAnimation(

@@ -47,7 +47,7 @@
                     android:clickable="true"
                     android:id="@+id/stop_button"
                     android:layout_gravity="bottom|end"
-                    android:src="@drawable/ic_media_stop"
+                    android:src="@raw/ic_media_stop"
                     app:backgroundTint="@color/colorAccent"
                     app:layout_constraintTop_toTopOf="parent" app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent" android:visibility="gone"/>
