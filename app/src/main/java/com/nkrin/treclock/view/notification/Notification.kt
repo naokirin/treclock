@@ -7,6 +7,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
+import android.media.AudioAttributes
 import android.media.RingtoneManager
 import com.nkrin.treclock.R
 
@@ -22,18 +23,23 @@ class Notification {
         val appName = context.getString(R.string.app_name)
 
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE)
-        val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+        val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
 
         val channel = NotificationChannel(
             channelId, appName, NotificationManager.IMPORTANCE_DEFAULT
         )
+        val audioAttributes = AudioAttributes.Builder()
+            .setUsage(AudioAttributes.USAGE_ALARM)
+            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+            .setFlags(AudioAttributes.FLAG_AUDIBILITY_ENFORCED)
+            .build()
         channel.description = message
         channel.enableVibration(true)
         channel.canShowBadge()
         channel.enableLights(true)
         channel.lightColor = Color.BLUE
         channel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
-        channel.setSound(defaultSoundUri, null)
+        channel.setSound(defaultSoundUri, audioAttributes)
         channel.setShowBadge(true)
 
         if (notificationManager is NotificationManager) {
@@ -45,6 +51,7 @@ class Notification {
                 .setAutoCancel(true)
                 .setContentIntent(pendingIntent)
                 .setWhen(System.currentTimeMillis())
+                .setCategory(Notification.CATEGORY_ALARM)
                 .build()
 
             notificationManager.notify(R.string.app_name, notification)
