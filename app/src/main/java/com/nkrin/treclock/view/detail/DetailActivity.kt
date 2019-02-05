@@ -375,6 +375,10 @@ class DetailActivity :
                 return
             }
          } else if (index == null) {
+             val schedule = detailViewModel.schedule
+             if (schedule != null) {
+                 supportActionBar?.title = schedule.name
+             }
              onProgressCompleted()
              Toast.makeText(this, "スケジュールを更新しました", Toast.LENGTH_SHORT)
                  .show()
