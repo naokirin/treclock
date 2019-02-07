@@ -8,9 +8,10 @@ import com.nkrin.treclock.view.alarm.Alarm
 import com.nkrin.treclock.view.alarm.AlarmPlayer
 import com.nkrin.treclock.view.notification.Notification
 import com.nkrin.treclock.view.notification.NotificationReceiver
-import java.time.Duration
-import java.time.OffsetDateTime
-import java.time.format.DateTimeFormatter
+import org.koin.dsl.module.applicationContext
+import org.threeten.bp.Duration
+import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.format.DateTimeFormatter
 
 class DetailAlarmManager(
     private val detailViewModel: DetailViewModel,
@@ -40,7 +41,7 @@ class DetailAlarmManager(
             AlarmPlayer.createNewRequestCode(),
             actualStart as OffsetDateTime,
             timeProvider.now(),
-            Notification()::notify,
+            { _, intent -> Notification(context).notify(intent) },
             intentSetup,
             context,
             NotificationReceiver::class.java,
@@ -52,6 +53,6 @@ class DetailAlarmManager(
 
     fun stopAllAlarms() {
         AlarmPlayer.cancel("${detailViewModel.schedule?.id}")
-        Notification().cancelAll(context)
+        Notification(context).cancelAll()
     }
 }

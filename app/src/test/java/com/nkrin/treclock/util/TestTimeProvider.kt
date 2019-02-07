@@ -1,8 +1,8 @@
 package com.nkrin.treclock.util
 
 import com.nkrin.treclock.util.time.TimeProvider
-import java.time.OffsetDateTime
-import java.time.ZoneOffset
+import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.ZoneOffset
 
 
 object TestTimeProvider : TimeProvider {

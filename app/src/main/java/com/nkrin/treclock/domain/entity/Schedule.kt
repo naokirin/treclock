@@ -1,6 +1,6 @@
 package com.nkrin.treclock.domain.entity
 
-import java.time.OffsetDateTime
+import org.threeten.bp.OffsetDateTime
 
 data class Schedule(
     var id: Int,

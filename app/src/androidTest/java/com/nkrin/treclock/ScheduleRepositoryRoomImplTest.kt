@@ -15,7 +15,7 @@ import org.koin.standalone.StandAloneContext.loadKoinModules
 import org.koin.standalone.StandAloneContext.stopKoin
 import org.koin.standalone.inject
 import org.koin.test.KoinTest
-import java.time.Duration
+import org.threeten.bp.Duration
 
 @RunWith(AndroidJUnit4::class)
 class ScheduleRepositoryRoomImplTest : KoinTest {

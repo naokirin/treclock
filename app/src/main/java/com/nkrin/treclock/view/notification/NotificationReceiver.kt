@@ -6,6 +6,6 @@ import android.content.Intent
 
 class NotificationReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
-        Notification().notify(context, intent)
+        Notification(context).notify(intent)
     }
 }

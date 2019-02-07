@@ -1,5 +1,6 @@
 package com.nkrin.treclock.view.notification
 
+import android.annotation.TargetApi
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -9,11 +10,14 @@ import android.content.Intent
 import android.graphics.Color
 import android.media.AudioAttributes
 import android.media.RingtoneManager
+import android.os.Build
+import android.support.v4.app.NotificationCompat
 import com.nkrin.treclock.R
 
 
-class Notification {
-    fun notify(context: Context, intent: Intent) {
+class Notification(private val context: Context) {
+
+    fun notify(intent: Intent) {
         val requestCode = intent.getIntExtra("request_code", 0)
         val message = intent.getStringExtra("message")
         val title = intent.getStringExtra("title")
@@ -23,8 +27,36 @@ class Notification {
         val appName = context.getString(R.string.app_name)
 
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE)
-        val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
 
+        if (Build.VERSION.SDK_INT >= 26) {
+            setNotificationChannel(channelId, appName, message)
+        }
+
+        if (notificationManager is NotificationManager) {
+            val notification = NotificationCompat.Builder(context, channelId)
+                .setContentTitle(title)
+                .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
+                .setContentText(message)
+                .setAutoCancel(true)
+                .setContentIntent(pendingIntent)
+                .setWhen(System.currentTimeMillis())
+                .setCategory(Notification.CATEGORY_ALARM)
+                .build()
+
+            notificationManager.notify(R.string.app_name, notification)
+        }
+    }
+
+    fun cancelAll() {
+        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE)
+        if (notificationManager is NotificationManager) {
+            notificationManager.cancelAll()
+        }
+    }
+
+    @TargetApi(26)
+    private fun setNotificationChannel(channelId: String, appName: String, message: String) {
+        val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
         val channel = NotificationChannel(
             channelId, appName, NotificationManager.IMPORTANCE_DEFAULT
         )
@@ -42,26 +74,9 @@ class Notification {
         channel.setSound(defaultSoundUri, audioAttributes)
         channel.setShowBadge(true)
 
-        if (notificationManager is NotificationManager) {
-            notificationManager.createNotificationChannel(channel)
-            val notification = Notification.Builder(context, channelId)
-                .setContentTitle(title)
-                .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
-                .setContentText(message)
-                .setAutoCancel(true)
-                .setContentIntent(pendingIntent)
-                .setWhen(System.currentTimeMillis())
-                .setCategory(Notification.CATEGORY_ALARM)
-                .build()
-
-            notificationManager.notify(R.string.app_name, notification)
-        }
-    }
-
-    fun cancelAll(context: Context) {
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE)
         if (notificationManager is NotificationManager) {
-            notificationManager.cancelAll()
+            notificationManager.createNotificationChannel(channel)
         }
     }
 }

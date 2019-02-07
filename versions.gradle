@@ -6,7 +6,7 @@ ext {
     // Android SDK and tools
     target_sdk_version = 28
     compile_sdk_version = 28
-    min_sdk_version = 26
+    min_sdk_version = 23
 
     // Android Components
     support_lib_version = '28.0.0'

@@ -22,7 +22,7 @@ import org.koin.test.KoinTest
 import org.mockito.*
 import org.mockito.BDDMockito.given
 import org.mockito.Mockito.*
-import java.time.Duration
+import org.threeten.bp.Duration
 
 class DetailViewModelTest: KoinTest {
     private lateinit var viewModel: DetailViewModel

@@ -4,7 +4,7 @@ import com.nkrin.treclock.util.TestTimeProvider
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import java.time.Duration
+import org.threeten.bp.Duration
 
 class ScheduleTest {
 

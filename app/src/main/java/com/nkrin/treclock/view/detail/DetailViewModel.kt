@@ -15,7 +15,7 @@ import com.nkrin.treclock.util.rx.toUi
 import com.nkrin.treclock.util.time.TimeProvider
 import io.reactivex.Completable
 import io.reactivex.disposables.CompositeDisposable
-import java.time.Duration
+import org.threeten.bp.Duration
 
 class DetailViewModel(
     private val schedulerProvider: SchedulerProvider,

@@ -5,8 +5,8 @@ import android.arch.persistence.room.ForeignKey
 import android.arch.persistence.room.Index
 import android.arch.persistence.room.PrimaryKey
 import com.nkrin.treclock.domain.entity.Step
-import java.time.Duration
-import java.time.OffsetDateTime
+import org.threeten.bp.Duration
+import org.threeten.bp.OffsetDateTime
 
 @Entity(
     tableName = "steps",

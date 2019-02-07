@@ -1,7 +1,7 @@
 package com.nkrin.treclock.domain.entity
 
-import java.time.Duration
-import java.time.OffsetDateTime
+import org.threeten.bp.Duration
+import org.threeten.bp.OffsetDateTime
 
 data class Step(
     var id: Int,

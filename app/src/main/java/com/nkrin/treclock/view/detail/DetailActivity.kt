@@ -37,8 +37,8 @@ import kotlinx.android.synthetic.main.content_detail.*
 import org.jetbrains.anko.find
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.viewModel
-import java.time.Duration
-import java.time.OffsetDateTime
+import org.threeten.bp.Duration
+import org.threeten.bp.OffsetDateTime
 
 
 class DetailActivity :
@@ -404,7 +404,7 @@ class DetailActivity :
             } else {
                 stop.hide()
                 play.show()
-                stoppingStepsCallbacks.forEach { _, callback -> callback() }
+                stoppingStepsCallbacks.forEach { (_, callback) -> callback() }
             }
         }
         onProgressCompleted()
@@ -416,7 +416,7 @@ class DetailActivity :
     private fun onPlayedStep(stepId: Any?) {
         if (stepId is Int) {
             playingStepsCallbacks[stepId]?.invoke()
-            stoppingStepsCallbacks.forEach { id, callback ->
+            stoppingStepsCallbacks.forEach { (id, callback) ->
                 if (id != stepId) {
                     callback()
                 }

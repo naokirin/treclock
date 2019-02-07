@@ -12,7 +12,7 @@ import android.view.LayoutInflater
 import com.nkrin.treclock.BR
 import com.nkrin.treclock.R
 import com.nkrin.treclock.databinding.FragmentNewStepDialogBinding
-import java.time.Duration
+import org.threeten.bp.Duration
 
 
 class NewStepDialogFragment : DialogFragment() {

@@ -3,7 +3,7 @@ package com.nkrin.treclock.util
 import io.reactivex.Completable
 import io.reactivex.Scheduler
 import io.reactivex.disposables.CompositeDisposable
-import java.time.OffsetDateTime
+import org.threeten.bp.OffsetDateTime
 import java.util.concurrent.TimeUnit
 
 class Timer(

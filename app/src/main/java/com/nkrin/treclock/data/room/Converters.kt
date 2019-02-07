@@ -1,9 +1,9 @@
 package com.nkrin.treclock.data.room
 
 import android.arch.persistence.room.TypeConverter
-import java.time.Duration
-import java.time.OffsetDateTime
-import java.time.format.DateTimeFormatter
+import org.threeten.bp.Duration
+import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.format.DateTimeFormatter
 
 class Converters {
     private val formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
