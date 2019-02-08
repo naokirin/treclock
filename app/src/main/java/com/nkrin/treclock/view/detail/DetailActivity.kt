@@ -54,6 +54,8 @@ class DetailActivity :
 
     private val playingStepsCallbacks: MutableMap<Int, () -> Unit> = mutableMapOf()
     private val stoppingStepsCallbacks: MutableMap<Int, () -> Unit> = mutableMapOf()
+    private val playingCallbacks: MutableMap<Int, () -> Unit> = mutableMapOf()
+    private val stoppingCallbacks: MutableMap<Int, () -> Unit> = mutableMapOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -172,6 +174,7 @@ class DetailActivity :
         detailViewModel.removeStep(id)
         playingStepsCallbacks.remove(id)
         stoppingStepsCallbacks.remove(id)
+        stoppingCallbacks.remove(id)
     }
 
 
@@ -205,15 +208,29 @@ class DetailActivity :
                 override fun onBindRow(holder: DetailViewHolder, tappedView: View, step: Step) {
                     playingStepsCallbacks[step.id] = {
                         val anim = AnimationUtils.loadAnimation(this@DetailActivity, R.anim.repeated_blinking_animation)
-                        val image = tappedView.find<ImageView>(R.id.detail_list_row_icon)
-                        image.startAnimation(anim)
+                        val playingIcon = tappedView.find<ImageView>(R.id.detail_row_playing_icon)
+                        playingIcon.visibility = View.VISIBLE
+                        playingIcon.startAnimation(anim)
                     }
 
                     stoppingStepsCallbacks[step.id] = {
-                        val image = tappedView.find<ImageView>(R.id.detail_list_row_icon)
+                        val image = tappedView.find<ImageView>(R.id.detail_row_playing_icon)
                         image.clearAnimation()
                         image.animate().cancel()
                         image.animation = null
+                        image.visibility = View.INVISIBLE
+                    }
+
+                    playingCallbacks[step.id] = {
+                        val draggableIcon = tappedView.find<ImageView>(R.id.detail_row_draggable_icon)
+                        draggableIcon.visibility = View.INVISIBLE
+                    }
+
+                    stoppingCallbacks[step.id] = {
+                        val playingIcon = tappedView.find<ImageView>(R.id.detail_row_playing_icon)
+                        val draggableIcon = tappedView.find<ImageView>(R.id.detail_row_draggable_icon)
+                        playingIcon.visibility = View.INVISIBLE
+                        draggableIcon.visibility = View.VISIBLE
                     }
                 }
                 override fun onClickRow(tappedView: View, step: Step) {
@@ -296,7 +313,12 @@ class DetailActivity :
                         }
                         return super.getSwipeDirs(recyclerView, viewHolder)
                     }
+
+                    override fun isLongPressDragEnabled(): Boolean {
+                        return false
+                    }
                 })
+            adapter.itemTouchHelper = ith
             ith.attachToRecyclerView(detailList)
 
             step_add.setOnClickListener {
@@ -401,10 +423,12 @@ class DetailActivity :
             if (playing) {
                 play.hide()
                 stop.show()
+                playingCallbacks.forEach { (_, callback) -> callback() }
             } else {
                 stop.hide()
                 play.show()
                 stoppingStepsCallbacks.forEach { (_, callback) -> callback() }
+                stoppingCallbacks.forEach { (_, callback) -> callback() }
             }
         }
         onProgressCompleted()

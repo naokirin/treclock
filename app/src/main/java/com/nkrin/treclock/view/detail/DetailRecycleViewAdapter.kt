@@ -1,7 +1,10 @@
 package com.nkrin.treclock.view.detail
 
+import android.support.v4.view.MotionEventCompat
 import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.helper.ItemTouchHelper
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import com.nkrin.treclock.R
@@ -14,6 +17,9 @@ class DetailRecycleViewAdapter(
 ) : RecyclerView.Adapter<DetailViewHolder>() {
 
     private lateinit var parent: ViewGroup
+    private var _itemTouchHelper: ItemTouchHelper? = null
+    var itemTouchHelper: ItemTouchHelper? = null
+        set(value) { _itemTouchHelper = value }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DetailViewHolder {
         this.parent = parent
@@ -30,13 +36,22 @@ class DetailRecycleViewAdapter(
             with(holder) {
                 titleView.text = item.title
                 durationView.text = durationText
-
+                reorderIcon.visibility = View.VISIBLE
 
                 itemView.setOnClickListener {
                     rowListener.onClickRow(it, item)
                 }
                 actionButton.setOnClickListener {
                     rowListener.onClickAction(it, item)
+                }
+                reorderIcon.setOnTouchListener { _, event ->
+                    if (event.action == MotionEvent.ACTION_DOWN) {
+                        val ith = _itemTouchHelper
+                        if (ith != null) {
+                            ith.startDrag(this)
+                        }
+                    }
+                    return@setOnTouchListener false
                 }
 
                 rowListener.onBindRow(holder, this.itemView, item)
