@@ -20,4 +20,5 @@
     <string name="action_description">action</string>
     <string name="playing_text">Playing</string>
     <string name="minutes_text">分</string>
+    <string name="playing_icon">playing_icon</string>
 </resources>
