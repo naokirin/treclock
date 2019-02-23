@@ -57,22 +57,23 @@ class Notification(private val context: Context) {
     @TargetApi(26)
     private fun setNotificationChannel(channelId: String, appName: String, message: String) {
         val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
-        val channel = NotificationChannel(
-            channelId, appName, NotificationManager.IMPORTANCE_DEFAULT
-        )
         val audioAttributes = AudioAttributes.Builder()
             .setUsage(AudioAttributes.USAGE_ALARM)
             .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
             .setFlags(AudioAttributes.FLAG_AUDIBILITY_ENFORCED)
             .build()
-        channel.description = message
-        channel.enableVibration(true)
-        channel.canShowBadge()
-        channel.enableLights(true)
-        channel.lightColor = Color.BLUE
-        channel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
-        channel.setSound(defaultSoundUri, audioAttributes)
-        channel.setShowBadge(true)
+        val channel = NotificationChannel(
+            channelId, appName, NotificationManager.IMPORTANCE_DEFAULT
+        ).apply {
+            description = message
+            enableVibration(true)
+            canShowBadge()
+            enableLights(true)
+            lightColor = Color.BLUE
+            lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+            setSound(defaultSoundUri, audioAttributes)
+            setShowBadge(true)
+        }
 
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE)
         if (notificationManager is NotificationManager) {

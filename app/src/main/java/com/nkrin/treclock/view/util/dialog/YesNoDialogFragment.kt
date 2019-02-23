@@ -56,12 +56,12 @@ class YesNoDialogFragment : DialogFragment() {
     companion object {
         fun create(dialogId: String, message: String, yesMessage: String, noMessage: String): YesNoDialogFragment {
             val dialog = YesNoDialogFragment()
-            val args = Bundle()
-            args.putString("dialog_id", dialogId)
-            args.putString("message", message)
-            args.putString("yes_message", yesMessage)
-            args.putString("no_message", noMessage)
-            dialog.arguments = args
+            dialog.arguments = Bundle().apply {
+                putString("dialog_id", dialogId)
+                putString("message", message)
+                putString("yes_message", yesMessage)
+                putString("no_message", noMessage)
+            }
             return dialog
         }
     }}

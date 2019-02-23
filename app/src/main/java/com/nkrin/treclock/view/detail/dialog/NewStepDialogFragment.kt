@@ -84,11 +84,11 @@ class NewStepDialogFragment : DialogFragment() {
     companion object {
         fun create(id: Int, title: String, minutes: Duration?): NewStepDialogFragment {
             val dialog = NewStepDialogFragment()
-            val args = Bundle()
-            args.putInt("id", id)
-            args.putString("title", title)
-            args.putInt("minutes", minutes?.toMinutes()?.toInt() ?: 0)
-            dialog.arguments = args
+            dialog.arguments = Bundle().apply {
+                putInt("id", id)
+                putString("title", title)
+                putInt("minutes", minutes?.toMinutes()?.toInt() ?: 0)
+            }
             return dialog
         }
     }

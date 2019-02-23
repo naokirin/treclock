@@ -91,9 +91,9 @@ class ProgressDialogFragment: DialogFragment() {
 
         fun create(message: String): ProgressDialogFragment {
             val dialog = ProgressDialogFragment()
-            val args = Bundle()
-            args.putString("message", message)
-            dialog.arguments = args
+            dialog.arguments = Bundle().apply {
+                putString("message", message)
+            }
             return dialog
         }
     }

@@ -70,11 +70,11 @@ class NewScheduleDialogFragment : DialogFragment() {
     companion object {
         fun create(id: Int, title: String, comment: String): NewScheduleDialogFragment {
             val dialog = NewScheduleDialogFragment()
-            val args = Bundle()
-            args.putInt("id", id)
-            args.putString("title", title)
-            args.putString("comment", comment)
-            dialog.arguments = args
+            dialog.arguments = Bundle().apply {
+                putInt("id", id)
+                putString("title", title)
+                putString("comment", comment)
+            }
             return dialog
         }
     }
