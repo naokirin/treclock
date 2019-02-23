@@ -21,4 +21,7 @@
     <string name="playing_text">Playing</string>
     <string name="minutes_text">分</string>
     <string name="playing_icon">playing_icon</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

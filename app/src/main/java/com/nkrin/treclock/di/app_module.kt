@@ -7,6 +7,7 @@ import com.nkrin.treclock.util.rx.SchedulerProvider
 import com.nkrin.treclock.util.time.ActualTimeProvider
 import com.nkrin.treclock.util.time.TimeProvider
 import com.nkrin.treclock.view.detail.DetailViewModel
+import com.nkrin.treclock.view.detail.SharedDetailViewModel
 import com.nkrin.treclock.view.scheduler.SchedulerViewModel
 import com.nkrin.treclock.view.splash.SplashViewModel
 import org.koin.android.viewmodel.ext.koin.viewModel
@@ -21,6 +22,7 @@ val treclockAppModule = module {
     viewModel { SplashViewModel(get()) }
     viewModel { SchedulerViewModel(get(), get()) }
     viewModel { DetailViewModel(get(), get(), get()) }
+    viewModel { SharedDetailViewModel() }
 }
 
 // Gather all app modules
