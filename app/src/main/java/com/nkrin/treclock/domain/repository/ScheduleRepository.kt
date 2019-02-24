@@ -8,6 +8,8 @@ import io.reactivex.Single
 interface ScheduleRepository {
     fun getSchedules(): Single<List<Schedule>>
 
+    fun getSchedule(id: Int): Single<Schedule>
+
     fun storeSchedules(schedules: List<Schedule>): Completable
 
     fun storeSchedule(schedule: Schedule): Completable
@@ -15,4 +17,10 @@ interface ScheduleRepository {
     fun deleteSchedulesFromId(scheduleIds: List<Int>): Completable
 
     fun deleteStepsFromId(stepIds: List<Int>): Completable
+
+    val cached : Boolean
+
+    fun getSchedulesFromCache(): List<Schedule>
+
+    fun getScheduleFromCache(id: Int): Schedule?
 }

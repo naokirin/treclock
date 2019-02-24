@@ -6,8 +6,7 @@ import com.nkrin.treclock.domain.entity.Schedule
 import com.nkrin.treclock.domain.entity.Step
 import com.nkrin.treclock.domain.repository.ScheduleRepositoryRoomImpl
 import org.junit.After
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -66,6 +65,32 @@ class ScheduleRepositoryRoomImplTest : KoinTest {
         scheduleRepositoryRoomImpl.storeSchedule(schedules[0]).blockingGet()
 
         assertEquals(schedules[0], scheduleRepositoryRoomImpl.getSchedules().blockingGet()[0])
+    }
+
+    @Test
+    fun testEmptyCacheBeforeGetSchedule() {
+        assertFalse(scheduleRepositoryRoomImpl.cached)
+        assertTrue(scheduleRepositoryRoomImpl.getSchedulesFromCache().isEmpty())
+    }
+
+    @Test
+    fun testCacheAfterGetSchedules() {
+        val schedules = Factory.schedules()
+        scheduleRepositoryRoomImpl.storeSchedules(schedules).blockingGet()
+        scheduleRepositoryRoomImpl.getSchedules().blockingGet()
+
+        assertTrue(scheduleRepositoryRoomImpl.cached)
+        assertEquals(schedules, scheduleRepositoryRoomImpl.getSchedulesFromCache())
+    }
+
+    @Test
+    fun testCacheAfterGetSchedule() {
+        val schedules = Factory.schedules()
+        scheduleRepositoryRoomImpl.storeSchedules(schedules).blockingGet()
+        scheduleRepositoryRoomImpl.getSchedule(schedules[0].id).blockingGet()
+
+        assertTrue(scheduleRepositoryRoomImpl.cached)
+        assertEquals(schedules, scheduleRepositoryRoomImpl.getSchedulesFromCache())
     }
 
     object Factory {
