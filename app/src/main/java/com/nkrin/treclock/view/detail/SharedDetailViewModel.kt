@@ -27,6 +27,7 @@ class SharedDetailViewModel: BaseViewModel() {
     fun onPlay() = playingCallbacks.forEach { it.value.invoke() }
     fun onStopAllSteps() = stoppingStepsCallbacks.forEach { it.value.invoke() }
     fun onStop() = stoppingCallbacks.forEach { it.value.invoke() }
+    fun onStopExcluded(id: Int) = stoppingStepsCallbacks.filter { it.key != id }.forEach { it.value.invoke() }
 
     fun addOnPlayStep(id: Int, callback: () -> Unit) {
         playingStepsCallbacks[id] = callback

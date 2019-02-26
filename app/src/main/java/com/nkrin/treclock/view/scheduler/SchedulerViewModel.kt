@@ -30,7 +30,8 @@ class SchedulerViewModel(
     val removingEvents: LiveData<ViewModelEvent>
         get() = _removingEvents
 
-    var list: MutableList<Schedule> = mutableListOf()
+    val schedules: List<Schedule>
+        get() { return schedulerRepository.getSchedulesFromCache() }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     fun onResume() {
@@ -43,7 +44,7 @@ class SchedulerViewModel(
             schedulerRepository.getSchedules()
                 .fromIo(schedulerProvider).toUi(schedulerProvider)
                 .subscribe(
-                    { onLoaded(it) },
+                    { onLoaded() },
                     { onLoadedError(it) }
                 )
         }
@@ -52,8 +53,9 @@ class SchedulerViewModel(
     fun addNewSchedule(title: String, comment: String): Int {
         _addingEvents.value = Pending
         val index = 0
-        val lastIdSchedule = list.maxBy { it.id }
+        val lastIdSchedule = schedules.maxBy { it.id }
         val id = if (lastIdSchedule == null) 1 else lastIdSchedule.id + 1
+        val list = schedules.toMutableList()
         list.add(index, Schedule(id, title, comment, mutableListOf()))
         launch {
             schedulerRepository.storeSchedules(list)
@@ -72,18 +74,15 @@ class SchedulerViewModel(
 
     fun removeSchedule(id: Int): Int {
         _removingEvents.value = Pending
-        val index = list.indexOfFirst { it.id == id }
+        val index = schedules.indexOfFirst { it.id == id }
         if (index != -1) {
-            val item = list.removeAt(index)
+            val list = schedules.toMutableList()
             launch {
                 schedulerRepository.storeSchedules(list)
                     .fromIo(schedulerProvider).toUi(schedulerProvider)
                     .subscribe(
                         { _removingEvents.value = Success(index) },
-                        {
-                            list.add(index, item)
-                            _removingEvents.value = Error(it)
-                        }
+                        { _removingEvents.value = Error(it) }
                     )
             }
         } else {
@@ -92,8 +91,7 @@ class SchedulerViewModel(
         return index
     }
 
-    private fun onLoaded(schedules: List<Schedule>) {
-        list = schedules.toMutableList()
+    private fun onLoaded() {
         _loadingEvents.value = Success()
     }
 

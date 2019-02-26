@@ -52,8 +52,9 @@ class DetailViewModelTest: KoinTest {
 
     @Test
     fun testLoad() {
-        val list = listOf(Schedule(1, "a", "", mutableListOf(mock(Step::class.java))))
-        given(repository.getSchedules()).willReturn(Single.just(list))
+        val schedule = Schedule(1, "a", "", mutableListOf(mock(Step::class.java)))
+        given(repository.getSchedule(1)).willReturn(Single.just(schedule))
+        given(repository.getScheduleFromCache(1)).willReturn(schedule)
         viewModel.scheduleId = 1
         viewModel.loadSchedule()
 
@@ -74,13 +75,20 @@ class DetailViewModelTest: KoinTest {
     fun testAddStep() {
         val title = "title"
         val duration = Duration.ofMinutes(1)
-        viewModel.schedule = Schedule(1, "schedule", "comment", mutableListOf())
+        val schedule = Schedule(1, "schedule", "comment", mutableListOf())
+        given(repository.getScheduleFromCache(1)).willReturn(schedule)
+
+        viewModel.scheduleId = 1
         viewModel.addStep(title, duration)
 
-        verify(repository, times(1)).storeSchedule(capture(captor))
-
-        assertEquals(1, viewModel.schedule!!.steps.size)
-        assertEquals(title, viewModel.schedule!!.steps[0].title)
-        assertEquals(duration, viewModel.schedule!!.steps[0].duration)
+        verify(repository, times(1))
+            .storeSchedule(
+                Schedule(
+                    1,
+                    "schedule",
+                    "comment",
+                    mutableListOf(Step(10001, 1, 0, title, duration))
+                )
+            )
     }
 }

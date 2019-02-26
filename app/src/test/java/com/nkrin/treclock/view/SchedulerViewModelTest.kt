@@ -79,24 +79,23 @@ class SchedulerViewModelTest: KoinTest {
 
     @Test
     fun testAddSchedule() {
+        given(repository.getSchedulesFromCache()).willReturn(listOf())
+
         val title = "title"
         val comment = "comment"
         viewModel.addNewSchedule(title, comment)
 
-        verify(repository, times(1)).storeSchedules(capture(captor))
-
-        assertEquals(1, viewModel.list.size)
-        assertEquals(title, viewModel.list[0].name)
-        assertEquals(comment, viewModel.list[0].comment)
+        verify(repository, times(1))
+            .storeSchedules(listOf(Schedule(1, title, comment, mutableListOf())))
     }
 
     @Test
     fun testRemoveSchedule() {
-        viewModel.addNewSchedule("", "")
-        viewModel.removeSchedule(viewModel.list[0].id)
+        val list = listOf(Schedule(1, "", "", mutableListOf()))
+        given(repository.getSchedulesFromCache()).willReturn(list)
 
-        verify(repository, times(2)).storeSchedules(capture(captor))
+        viewModel.removeSchedule(1)
 
-        assertTrue(viewModel.list.isEmpty())
+        verify(repository, times(1)).storeSchedules(list)
     }
 }

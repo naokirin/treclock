@@ -16,6 +16,7 @@ import com.nkrin.treclock.domain.entity.Schedule
 import com.nkrin.treclock.util.mvvm.Error
 import com.nkrin.treclock.util.mvvm.Pending
 import com.nkrin.treclock.util.mvvm.Success
+import com.nkrin.treclock.util.rx.SchedulerProvider
 import com.nkrin.treclock.util.time.TimeProvider
 import com.nkrin.treclock.view.detail.DetailActivity
 import com.nkrin.treclock.view.util.dialog.NewScheduleDialogFragment
@@ -30,6 +31,7 @@ import org.koin.android.viewmodel.ext.android.viewModel
 class SchedulerActivity : AppCompatActivity(), NewScheduleDialogFragment.Listener {
 
     private val schedulerViewModel: SchedulerViewModel by viewModel()
+    private val playingViewModel: SchedulerPlayingViewModel by viewModel()
     private val timeProvider: TimeProvider by inject()
     private lateinit var schedulerList: RecyclerView
 
@@ -125,6 +127,7 @@ class SchedulerActivity : AppCompatActivity(), NewScheduleDialogFragment.Listene
     private fun onLoaded() {
         val adapter = SchedulerRecycleViewAdapter(
             schedulerViewModel,
+            playingViewModel,
             timeProvider,
             object : SchedulerRecycleViewAdapter.RowListener {
                 override fun onClickRow(tappedView: View, schedule: Schedule) {
@@ -172,9 +175,9 @@ class SchedulerActivity : AppCompatActivity(), NewScheduleDialogFragment.Listene
 
                 override fun onSwiped(viewHolder: ViewHolder, direction: Int) {
                     val fromPos = viewHolder.adapterPosition
-                    val schedules = schedulerViewModel.list
+                    val schedules = schedulerViewModel.schedules
                     if (schedules != null && schedules.size > fromPos) {
-                        if (schedulerViewModel.list[fromPos].played(timeProvider.now())) {
+                        if (schedulerViewModel.schedules[fromPos].played(timeProvider.now())) {
                             return
                         }
                         removeSchedule(schedules[fromPos].id)
@@ -183,7 +186,7 @@ class SchedulerActivity : AppCompatActivity(), NewScheduleDialogFragment.Listene
 
                 override fun getSwipeDirs(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
                     val pos = viewHolder.adapterPosition
-                    val schedules = schedulerViewModel.list
+                    val schedules = schedulerViewModel.schedules
                     if (schedules.size > pos && schedules[pos].played(timeProvider.now())) {
                         return 0
                     }

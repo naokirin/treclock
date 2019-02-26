@@ -14,7 +14,6 @@ import com.nkrin.treclock.util.rx.fromIo
 import com.nkrin.treclock.util.rx.toUi
 import com.nkrin.treclock.util.time.TimeProvider
 import io.reactivex.Completable
-import io.reactivex.disposables.CompositeDisposable
 import org.threeten.bp.Duration
 
 class DetailViewModel(
@@ -56,26 +55,21 @@ class DetailViewModel(
         get() = _settingStepTimerEvents
 
     var scheduleId: Int = 0
-    var schedule: Schedule? = null
+    val schedule: Schedule?
+        get() = schedulerRepository.getScheduleFromCache(scheduleId)
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     fun onResume() {
         loadSchedule()
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
-    fun onPause() {
-        storeSchedule()
-    }
-
     fun loadSchedule() {
         _loadingEvents.value = Pending
         launch {
-            schedulerRepository.getSchedules()
+            schedulerRepository.getSchedule(scheduleId)
                 .fromIo(schedulerProvider).toUi(schedulerProvider)
                 .subscribe(
-                    { schedules ->
-                        schedule = schedules.find { it.id == scheduleId }
+                    { schedule ->
                         _loadingEvents.value = Success(schedule)
                     },
                     { _loadingEvents.value = Error(it) }
@@ -100,24 +94,17 @@ class DetailViewModel(
             val index = s.steps.size
             val lastIdStep = s.steps.maxBy { it.id }
             val id = if (lastIdStep == null) s.id * 10000 + 1 else lastIdStep.id + 1
-            schedule?.steps?.add(
+            s.steps.add(
                 Step(id, s.id, index, title, duration, null)
             )
             _addingEvents.value = Pending
             launch {
-                val ss = schedule
-                if (ss != null) {
-                    schedulerRepository.storeSchedule(ss)
-                        .fromIo(schedulerProvider).toUi(schedulerProvider)
-                        .subscribe(
-                            { _addingEvents.value = Success(index) },
-                            { _addingEvents.value = Error(it) }
-                        )
-                } else {
-                    Completable.complete().subscribe {
-                        _addingEvents.value = Success(-1)
-                    }
-                }
+                schedulerRepository.storeSchedule(s)
+                    .fromIo(schedulerProvider).toUi(schedulerProvider)
+                    .subscribe(
+                        { _addingEvents.value = Success(index) },
+                        { _addingEvents.value = Error(it) }
+                    )
             }
         }
     }
@@ -125,23 +112,16 @@ class DetailViewModel(
     fun updateSchedule(title: String, comment: String) {
         val s = schedule
         if (s != null) {
-            schedule?.name = title
-            schedule?.comment = comment
+            s.name = title
+            s.comment = comment
             _updatingEvents.value = Pending
             launch {
-                val ss = schedule
-                if (ss != null) {
-                    schedulerRepository.storeSchedule(ss)
-                        .fromIo(schedulerProvider).toUi(schedulerProvider)
-                        .subscribe(
-                            { _updatingEvents.value = Success() },
-                            { _updatingEvents.value = Error(it) }
-                        )
-                } else {
-                    Completable.complete().subscribe {
-                        _updatingEvents.value = Success(-1)
-                    }
-                }
+                schedulerRepository.storeSchedule(s)
+                    .fromIo(schedulerProvider).toUi(schedulerProvider)
+                    .subscribe(
+                        { _updatingEvents.value = Success() },
+                        { _updatingEvents.value = Error(it) }
+                    )
             }
         }
     }
@@ -162,60 +142,44 @@ class DetailViewModel(
         if (s != null) {
             _removingEvents.value = Pending
             val index = s.steps.indexOfFirst { it.id == id }
-            schedule?.steps?.removeAt(index)
+            s.steps.removeAt(index)
             launch {
-                val ss = schedule
-                if (ss != null) {
-                    schedulerRepository.deleteStepsFromId(listOf(id))
-                        .fromIo(schedulerProvider).toUi(schedulerProvider)
-                        .subscribe(
-                            { _removingEvents.value = Success(index) },
-                            { _removingEvents.value = Error(it) }
-                        )
-                } else {
-                    Completable.complete().subscribe {
-                        _removingEvents.value = Success(-1)
-                    }
-                }
+                schedulerRepository.deleteStepsFromId(listOf(id))
+                    .fromIo(schedulerProvider).toUi(schedulerProvider)
+                    .subscribe(
+                        { _removingEvents.value = Success(index) },
+                        { _removingEvents.value = Error(it) }
+                    )
             }
         }
     }
 
     fun updateStepOrder(id: Int, to: Int) {
-        val steps = schedule?.steps
+        val s = schedule
+        val steps = s?.steps
         if (steps != null) {
             val from = steps.indexOfFirst { it.id == id }
             val step = steps[from]
             steps.remove(step)
             steps.add(to, step)
-            schedule?.steps = steps
+            s.steps = steps
             launch {
-                val ss = schedule
-                if (ss != null) {
-                    schedulerRepository.storeSchedule(ss)
-                        .fromIo(schedulerProvider).toUi(schedulerProvider)
-                        .subscribe()
-                } else {
-                    CompositeDisposable()
-                }
+                schedulerRepository.storeSchedule(s)
+                    .fromIo(schedulerProvider).toUi(schedulerProvider)
+                    .subscribe()
             }
         }
     }
 
     fun removeSchedule() {
-        val s = schedule
-        if (s != null) {
-            schedule = null
-            val id = s.id
-            _removingScheduleEvents.value = Pending
-            launch {
-                schedulerRepository.deleteSchedulesFromId(listOf(id))
-                    .fromIo(schedulerProvider).toUi(schedulerProvider)
-                    .subscribe(
-                        { _removingScheduleEvents.value = Success() },
-                        { _removingScheduleEvents.value = Error(it) }
-                    )
-            }
+        _removingScheduleEvents.value = Pending
+        launch {
+            schedulerRepository.deleteSchedulesFromId(listOf(scheduleId))
+                .fromIo(schedulerProvider).toUi(schedulerProvider)
+                .subscribe(
+                    { _removingScheduleEvents.value = Success() },
+                    { _removingScheduleEvents.value = Error(it) }
+                )
         }
     }
 
@@ -233,7 +197,7 @@ class DetailViewModel(
                 }
             }
             startPlayingTimer(id)
-            playOrStopSchedule(true)
+            playOrStopSchedule(true, id)
         }
     }
 
@@ -250,9 +214,16 @@ class DetailViewModel(
 
     fun stopSchedule() {
         _playingEvents.value = Pending
-        schedule?.steps?.forEach { it.actualStart = null }
-
-        if (schedule == null) {
+        val s = schedule
+        if (s != null) {
+            s.steps.forEach { it.actualStart = null }
+            launch {
+                schedulerRepository.storeSchedule(s)
+                    .fromIo(schedulerProvider).toUi(schedulerProvider)
+                    .subscribe()
+            }
+        }
+        else {
             _playingEvents.value = Error(Throwable("Schedule is not found"))
             return
         }
@@ -261,10 +232,11 @@ class DetailViewModel(
         playOrStopSchedule(false)
     }
 
-    private fun playOrStopSchedule(playing: Boolean) {
+    private fun playOrStopSchedule(playing: Boolean, stepId: Int? = null) {
         launch {
             val s = schedule
             if (s != null) {
+                s.steps.find { it.id == stepId }?.actualStart = timeProvider.now()
                 schedulerRepository.storeSchedule(s)
                     .fromIo(schedulerProvider).toUi(schedulerProvider)
                     .subscribe(
@@ -283,7 +255,7 @@ class DetailViewModel(
         stopPlayingTimers()
 
         val now = timeProvider.now()
-        val step = schedule?.steps?.lastOrNull {
+        val step = schedule?.steps?.reversed()?.firstOrNull {
             val actualStart = it.actualStart
             actualStart != null && actualStart <= now
         }
@@ -302,6 +274,7 @@ class DetailViewModel(
             }
             val actualStart = step.actualStart
             if (actualStart != null) {
+                startStep(step.id)
                 startPlayingTimer(
                     step.id,
                     Duration.ofSeconds(now.toEpochSecond() - actualStart.toEpochSecond())

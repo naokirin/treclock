@@ -9,9 +9,9 @@ data class Schedule(
     var steps: MutableList<Step>
 ) {
     fun played(now: OffsetDateTime) : Boolean {
-        return steps.any {
+        return steps.reversed().any {
             val start = it.actualStart
-            return start != null && start + it.duration >= now
+            return start != null && (start + it.duration) >= now
         }
     }
 }

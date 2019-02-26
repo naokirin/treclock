@@ -269,8 +269,8 @@ class DetailActivity :
             } else {
                 stop.hide()
                 play.show()
-                sharedDetailViewModel.onStopAllSteps()
                 sharedDetailViewModel.onStop()
+                sharedDetailViewModel.onStopAllSteps()
             }
         }
         onProgressCompleted()
@@ -281,7 +281,7 @@ class DetailActivity :
 
     private fun onPlayedStep(stepId: Any?) {
         if (stepId is Int) {
-            sharedDetailViewModel.onStop()
+            sharedDetailViewModel.onStopExcluded(stepId)
             sharedDetailViewModel.onPlayStep(stepId)
         }
     }

@@ -6,11 +6,13 @@ import android.view.View
 import android.view.ViewGroup
 import com.nkrin.treclock.R
 import com.nkrin.treclock.domain.entity.Schedule
+import com.nkrin.treclock.util.rx.SchedulerProvider
 import com.nkrin.treclock.util.time.TimeProvider
 
 
 class SchedulerRecycleViewAdapter(
     private val viewModel: SchedulerViewModel,
+    private val playingViewModel: SchedulerPlayingViewModel,
     private val timeProvider: TimeProvider,
     private val rowListener: RowListener
 ) : RecyclerView.Adapter<SchedulerViewHolder>() {
@@ -22,16 +24,19 @@ class SchedulerRecycleViewAdapter(
     }
 
     override fun onBindViewHolder(holder: SchedulerViewHolder, position: Int) {
-        val item = viewModel.list[position]
+        val item = viewModel.schedules[position]
+        playingViewModel.stopSchedule(item.id)
         holder.titleView.text = item.name
         holder.detailView.text = item.comment
 
         if (item.played(timeProvider.now())) {
-            holder.actionButton.visibility = View.GONE
-            holder.playingText.visibility = View.VISIBLE
+            enablePlaying(holder)
+            playingViewModel.resumeSchedule(item.id) {
+                disablePlaying(holder)
+            }
         } else {
-            holder.actionButton.visibility = View.VISIBLE
-            holder.playingText.visibility = View.GONE
+            disablePlaying(holder)
+            playingViewModel.stopSchedule(item.id)
         }
 
         holder.itemView.setOnClickListener {
@@ -43,7 +48,17 @@ class SchedulerRecycleViewAdapter(
     }
 
     override fun getItemCount(): Int {
-        return viewModel.list.size
+        return viewModel.schedules.size
+    }
+
+    private fun enablePlaying(holder: SchedulerViewHolder) {
+        holder.actionButton.visibility = View.GONE
+        holder.playingText.visibility = View.VISIBLE
+    }
+
+    private fun disablePlaying(holder: SchedulerViewHolder) {
+        holder.actionButton.visibility = View.VISIBLE
+        holder.playingText.visibility = View.GONE
     }
 
     interface RowListener {

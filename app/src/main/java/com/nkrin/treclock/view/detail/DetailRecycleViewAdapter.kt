@@ -1,6 +1,5 @@
 package com.nkrin.treclock.view.detail
 
-import android.support.v4.view.MotionEventCompat
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
 import android.view.LayoutInflater
