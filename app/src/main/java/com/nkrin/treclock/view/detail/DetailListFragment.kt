@@ -23,6 +23,7 @@ import org.jetbrains.anko.find
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 
+
 class DetailListFragment : Fragment() {
 
     val detailViewModel: DetailViewModel by sharedViewModel()
@@ -206,6 +207,14 @@ class DetailListFragment : Fragment() {
                 override fun onGlobalLayout() {
                     if (detailViewModel.schedule?.played(timeProvider.now()) == true) {
                         detailViewModel.resumePlayingTimer()
+                        val adaptor = detailList.adapter
+                        if (adaptor != null) {
+                            detailList.layoutManager?.smoothScrollToPosition(
+                                detailList,
+                                RecyclerView.State(),
+                                adaptor.itemCount
+                            )
+                        }
                     }
                     detailList.viewTreeObserver.removeOnGlobalLayoutListener(this)
                 }
