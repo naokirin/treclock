@@ -21,6 +21,7 @@ import com.nkrin.treclock.util.time.TimeProvider
 import com.nkrin.treclock.view.detail.DetailActivity
 import com.nkrin.treclock.view.util.dialog.NewScheduleDialogFragment
 import com.nkrin.treclock.view.util.BackgroundItemDecoration
+import com.nkrin.treclock.view.util.LastMerginItemDecoration
 import com.nkrin.treclock.view.util.dialog.ProgressDialogFragment
 import kotlinx.android.synthetic.main.activity_scheduler.*
 import kotlinx.android.synthetic.main.content_scheduler.*
@@ -53,6 +54,8 @@ class SchedulerActivity : AppCompatActivity(), NewScheduleDialogFragment.Listene
                 R.drawable.item_white_background
             )
         )
+
+        schedulerList.addItemDecoration(LastMerginItemDecoration())
 
         schedulerViewModel.loadingEvents.observe(this, Observer {
             when(it) {

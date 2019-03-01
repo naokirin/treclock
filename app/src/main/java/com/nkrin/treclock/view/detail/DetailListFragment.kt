@@ -19,6 +19,7 @@ import com.nkrin.treclock.domain.entity.Step
 import com.nkrin.treclock.util.time.TimeProvider
 import com.nkrin.treclock.view.detail.dialog.NewStepDialogFragment
 import com.nkrin.treclock.view.util.BackgroundItemDecoration
+import com.nkrin.treclock.view.util.LastMerginItemDecoration
 import org.jetbrains.anko.find
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.sharedViewModel
@@ -54,6 +55,7 @@ class DetailListFragment : Fragment() {
         detailList.addItemDecoration(
             BackgroundItemDecoration(R.drawable.item_grey_background, R.drawable.item_white_background)
         )
+        detailList.addItemDecoration(LastMerginItemDecoration())
 
         sharedViewModel.insertedStepEvent.observe(this, Observer {
             if (it != null) {
