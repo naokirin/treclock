@@ -37,6 +37,7 @@ class ProgressDialogFragment: DialogFragment() {
 
         val builder = AlertDialog.Builder(activity)
         builder.setView(binding.root)
+        builder.setCancelable(false)
         return builder.create()
     }
 
