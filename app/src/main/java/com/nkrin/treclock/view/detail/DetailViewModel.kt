@@ -1,20 +1,21 @@
 package com.nkrin.treclock.view.detail
 
-import android.arch.lifecycle.Lifecycle
-import android.arch.lifecycle.LifecycleObserver
-import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.OnLifecycleEvent
+import android.arch.lifecycle.*
 import com.nkrin.treclock.domain.entity.Schedule
 import com.nkrin.treclock.domain.entity.Step
 import com.nkrin.treclock.domain.repository.ScheduleRepository
 import com.nkrin.treclock.util.Timer
 import com.nkrin.treclock.util.mvvm.*
 import com.nkrin.treclock.util.rx.SchedulerProvider
+import com.nkrin.treclock.util.rx.fromComputation
 import com.nkrin.treclock.util.rx.fromIo
 import com.nkrin.treclock.util.rx.toUi
 import com.nkrin.treclock.util.time.TimeProvider
 import io.reactivex.Completable
+import io.reactivex.Observable
+import io.reactivex.disposables.CompositeDisposable
 import org.threeten.bp.Duration
+import java.util.concurrent.TimeUnit
 
 class DetailViewModel(
     private val schedulerProvider: SchedulerProvider,
@@ -42,11 +43,11 @@ class DetailViewModel(
     val removingScheduleEvents: LiveData<ViewModelEvent>
         get() = _removingScheduleEvents
 
-    private val _playingEvents = SingleLiveEvent<ViewModelEvent>()
+    private val _playingEvents = MutableLiveData<ViewModelEvent>()
     val playingEvents: LiveData<ViewModelEvent>
         get() = _playingEvents
 
-    private val _playingStepEvents = SingleLiveEvent<ViewModelEvent>()
+    private val _playingStepEvents = MutableLiveData<ViewModelEvent>()
     val playingStepEvents: LiveData<ViewModelEvent>
         get() = _playingStepEvents
 
@@ -54,9 +55,24 @@ class DetailViewModel(
     val settingStepTimerEvents: LiveData<ViewModelEvent>
         get() = _settingStepTimerEvents
 
+    private val _tickingSecondsEvents = SingleLiveEvent<Unit>()
+    val tickingSecondsEvents: LiveData<Unit>
+        get() = _tickingSecondsEvents
+
     var scheduleId: Int = 0
     val schedule: Schedule?
         get() = schedulerRepository.getScheduleFromCache(scheduleId)
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_START)
+    fun onStart() {
+        launch {
+            Observable.interval(1L, TimeUnit.SECONDS)
+                .fromComputation(schedulerProvider).toUi(schedulerProvider)
+                .subscribe {
+                    _tickingSecondsEvents.value = Unit
+                }
+        }
+    }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     fun onResume() {

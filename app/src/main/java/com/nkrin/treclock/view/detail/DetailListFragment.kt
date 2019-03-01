@@ -83,13 +83,13 @@ class DetailListFragment : Fragment() {
     private fun onLoaded() {
         val adapter = DetailRecycleViewAdapter(
             detailViewModel,
+            timeProvider,
             object : DetailRecycleViewAdapter.RowListener {
                 override fun onBindRow(holder: DetailViewHolder, tappedView: View, step: Step) {
                     sharedViewModel.addOnPlayStep(step.id) {
                         val anim = AnimationUtils.loadAnimation(context, R.anim.repeated_blinking_animation)
-                        val playingIcon = tappedView.find<ImageView>(R.id.detail_row_playing_icon)
-                        playingIcon.visibility = View.VISIBLE
-                        playingIcon.startAnimation(anim)
+                        holder.playingIcon.visibility = View.VISIBLE
+                        holder.playingIcon.startAnimation(anim)
                     }
 
                     sharedViewModel.addOnStopStep(step.id) {
@@ -207,14 +207,15 @@ class DetailListFragment : Fragment() {
         detailList.viewTreeObserver.addOnGlobalLayoutListener (
             object: ViewTreeObserver.OnGlobalLayoutListener {
                 override fun onGlobalLayout() {
-                    if (detailViewModel.schedule?.played(timeProvider.now()) == true) {
+                    val step = detailViewModel.schedule?.playingStep(timeProvider.now())
+                    if (step != null) {
                         detailViewModel.resumePlayingTimer()
-                        val adaptor = detailList.adapter
-                        if (adaptor != null) {
+                        val index = detailViewModel.schedule?.steps?.indexOfFirst { it.id == step.id }
+                        if (index != null && index >= 0) {
                             detailList.layoutManager?.smoothScrollToPosition(
                                 detailList,
                                 RecyclerView.State(),
-                                adaptor.itemCount
+                                index
                             )
                         }
                     }

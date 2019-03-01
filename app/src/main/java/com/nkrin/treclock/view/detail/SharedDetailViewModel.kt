@@ -1,5 +1,6 @@
 package com.nkrin.treclock.view.detail
 
+import android.arch.lifecycle.MutableLiveData
 import com.nkrin.treclock.util.mvvm.BaseViewModel
 import com.nkrin.treclock.util.mvvm.SingleLiveEvent
 
@@ -23,7 +24,7 @@ class SharedDetailViewModel: BaseViewModel() {
     val loadingEvent: SingleLiveEvent<Unit>
         get() = _loadingEvent
 
-    fun onPlayStep(id: Int) = playingStepsCallbacks.get(id)?.invoke()
+    fun onPlayStep(id: Int) = playingStepsCallbacks[id]?.invoke()
     fun onPlay() = playingCallbacks.forEach { it.value.invoke() }
     fun onStopAllSteps() = stoppingStepsCallbacks.forEach { it.value.invoke() }
     fun onStop() = stoppingCallbacks.forEach { it.value.invoke() }

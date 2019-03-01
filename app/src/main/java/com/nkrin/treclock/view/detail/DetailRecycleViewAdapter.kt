@@ -6,12 +6,15 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
 import com.nkrin.treclock.R
 import com.nkrin.treclock.domain.entity.Step
+import com.nkrin.treclock.util.time.TimeProvider
 
 
 class DetailRecycleViewAdapter(
     private val viewModel: DetailViewModel,
+    private val timeProvider: TimeProvider,
     private val rowListener: RowListener
 ) : RecyclerView.Adapter<DetailViewHolder>() {
 
@@ -35,7 +38,23 @@ class DetailRecycleViewAdapter(
             with(holder) {
                 titleView.text = item.title
                 durationView.text = durationText
-                reorderIcon.visibility = View.VISIBLE
+                if (schedule.played(timeProvider.now())) {
+                    val now = timeProvider.now()
+                    val actualStart = item.actualStart
+                    if (actualStart != null) {
+                        if (actualStart <= now && now < actualStart + item.duration)  {
+                            val anim = AnimationUtils.loadAnimation(itemView.context, R.anim.repeated_blinking_animation)
+                            playingIcon.visibility = View.VISIBLE
+                            playingIcon.startAnimation(anim)
+                        }
+                    }
+                    reorderIcon.visibility = View.GONE
+                }
+                else {
+                    reorderIcon.visibility = View.VISIBLE
+                    playingIcon.visibility = View.INVISIBLE
+                    playingIcon.clearAnimation()
+                }
 
                 itemView.setOnClickListener {
                     rowListener.onClickRow(it, item)
@@ -52,6 +71,8 @@ class DetailRecycleViewAdapter(
                     }
                     return@setOnTouchListener false
                 }
+
+                playingIcon.setHasTransientState(true)
 
                 rowListener.onBindRow(holder, this.itemView, item)
             }

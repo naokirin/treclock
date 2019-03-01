@@ -14,4 +14,13 @@ data class Schedule(
             return start != null && (start + it.duration) >= now
         }
     }
+
+    fun playingStep(now: OffsetDateTime) : Step? = steps.firstOrNull {
+        val actualStart = it.actualStart
+        if (actualStart != null) {
+            actualStart <= now && now < actualStart + it.duration
+        } else {
+            false
+        }
+    }
 }
