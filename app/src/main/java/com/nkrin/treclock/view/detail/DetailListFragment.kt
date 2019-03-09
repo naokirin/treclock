@@ -19,7 +19,7 @@ import com.nkrin.treclock.domain.entity.Step
 import com.nkrin.treclock.util.time.TimeProvider
 import com.nkrin.treclock.view.detail.dialog.NewStepDialogFragment
 import com.nkrin.treclock.view.util.BackgroundItemDecoration
-import com.nkrin.treclock.view.util.LastMerginItemDecoration
+import com.nkrin.treclock.view.util.LastMarginItemDecoration
 import org.jetbrains.anko.find
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.sharedViewModel
@@ -55,7 +55,7 @@ class DetailListFragment : Fragment() {
         detailList.addItemDecoration(
             BackgroundItemDecoration(R.drawable.item_grey_background, R.drawable.item_white_background)
         )
-        detailList.addItemDecoration(LastMerginItemDecoration())
+        detailList.addItemDecoration(LastMarginItemDecoration())
 
         sharedViewModel.insertedStepEvent.observe(this, Observer {
             if (it != null) {
@@ -76,8 +76,25 @@ class DetailListFragment : Fragment() {
         sharedViewModel.loadingEvent.observe(this, Observer { onLoaded() })
     }
 
-    private fun notifyItemInserted(position: Int) = detailList.adapter?.notifyItemInserted(position)
-    private fun notifyItemRemoved(position: Int) = detailList.adapter?.notifyItemRemoved(position)
+    private fun notifyItemInserted(position: Int) {
+        detailList.adapter?.notifyItemInserted(position)
+
+        // Note: update ItemDecoration
+        val count = detailList.adapter?.itemCount
+        if (count == position + 1 && count > 1) {
+            detailList.adapter?.notifyItemChanged(position - 1)
+        }
+    }
+    private fun notifyItemRemoved(position: Int) {
+        detailList.adapter?.notifyItemRemoved(position)
+
+        // Note: update ItemDecoration
+        val count = detailList.adapter?.itemCount
+        if (count == position && count >= 1) {
+            detailList.adapter?.notifyItemChanged(count - 1)
+        }
+    }
+
     private fun notifyItemChanged(position: Int) = detailList.adapter?.notifyItemChanged(position)
 
     private fun onLoaded() {
