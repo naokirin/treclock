@@ -1,6 +1,6 @@
 package com.nkrin.treclock.domain.entity
 
-import com.nkrin.treclock.util.TestTimeProvider
+import com.nkrin.treclock.util.time.TestTimeProvider
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test

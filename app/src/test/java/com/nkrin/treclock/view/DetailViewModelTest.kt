@@ -6,8 +6,7 @@ import com.nkrin.treclock.domain.entity.Schedule
 import com.nkrin.treclock.domain.entity.Step
 import com.nkrin.treclock.domain.repository.ScheduleRepository
 import com.nkrin.treclock.util.TestSchedulerProvider
-import com.nkrin.treclock.util.TestTimeProvider
-import com.nkrin.treclock.util.capture
+import com.nkrin.treclock.util.time.TestTimeProvider
 import com.nkrin.treclock.util.mvvm.*
 import com.nkrin.treclock.util.mvvm.ViewModelEvent
 import com.nkrin.treclock.view.detail.DetailViewModel

@@ -1,4 +1,4 @@
-package com.nkrin.treclock.util
+package com.nkrin.treclock.util.time
 
 import com.nkrin.treclock.util.time.TimeProvider
 import org.threeten.bp.OffsetDateTime
