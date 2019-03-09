@@ -10,4 +10,7 @@ data class Step(
     var title: String,
     var duration: Duration,
     var actualStart: OffsetDateTime? = null
-)
+) {
+    fun createStarted(startTime: OffsetDateTime) =
+            Step(id, scheduleId, order, title, duration, startTime)
+}

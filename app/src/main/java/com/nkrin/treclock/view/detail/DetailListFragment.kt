@@ -209,7 +209,7 @@ class DetailListFragment : Fragment() {
                 override fun onGlobalLayout() {
                     val step = detailViewModel.schedule?.playingStep(timeProvider.now())
                     if (step != null) {
-                        detailViewModel.resumePlayingTimer()
+                        detailViewModel.resumePlaying()
                         val index = detailViewModel.schedule?.steps?.indexOfFirst { it.id == step.id }
                         if (index != null && index >= 0) {
                             detailList.layoutManager?.smoothScrollToPosition(

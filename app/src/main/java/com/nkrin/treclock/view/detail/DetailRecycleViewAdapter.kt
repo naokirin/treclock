@@ -64,10 +64,7 @@ class DetailRecycleViewAdapter(
                 }
                 reorderIcon.setOnTouchListener { _, event ->
                     if (event.action == MotionEvent.ACTION_DOWN) {
-                        val ith = _itemTouchHelper
-                        if (ith != null) {
-                            ith.startDrag(this)
-                        }
+                        _itemTouchHelper?.startDrag(this)
                     }
                     return@setOnTouchListener false
                 }

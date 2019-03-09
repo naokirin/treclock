@@ -15,6 +15,7 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import org.threeten.bp.Duration
+import org.threeten.bp.OffsetDateTime
 import java.util.concurrent.TimeUnit
 
 class DetailViewModel(
@@ -47,21 +48,23 @@ class DetailViewModel(
     val playingEvents: LiveData<ViewModelEvent>
         get() = _playingEvents
 
-    private val _playingStepEvents = MutableLiveData<ViewModelEvent>()
     val playingStepEvents: LiveData<ViewModelEvent>
-        get() = _playingStepEvents
+        get() = timers.playingStepEvents
 
-    private val _settingStepTimerEvents = SingleLiveEvent<ViewModelEvent>()
     val settingStepTimerEvents: LiveData<ViewModelEvent>
-        get() = _settingStepTimerEvents
+        get() = timers.settingStepTimerEvents
 
     private val _tickingSecondsEvents = SingleLiveEvent<Unit>()
     val tickingSecondsEvents: LiveData<Unit>
         get() = _tickingSecondsEvents
 
-    var scheduleId: Int = 0
+    private var _scheduleId: Int = 0
+    val scheduleId: Int
+        get() = _scheduleId
     val schedule: Schedule?
         get() = schedulerRepository.getScheduleFromCache(scheduleId)
+
+    private lateinit var timers : DetailPlayingTimers
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     fun onStart() {
@@ -79,6 +82,13 @@ class DetailViewModel(
         loadSchedule()
     }
 
+    fun initScheduleId(scheduleId: Int) {
+        _scheduleId = scheduleId
+        timers = DetailPlayingTimers(scheduleId, schedulerProvider, timeProvider, schedulerRepository) {
+            playOrStopSchedule(false)
+        }
+    }
+
     fun loadSchedule() {
         _loadingEvents.value = Pending
         launch {
@@ -90,17 +100,6 @@ class DetailViewModel(
                     },
                     { _loadingEvents.value = Error(it) }
                 )
-        }
-    }
-
-    private fun storeSchedule() {
-        val s = schedule
-        if (s != null) {
-            launch {
-                schedulerRepository.storeSchedule(s)
-                    .fromIo(schedulerProvider).toUi(schedulerProvider)
-                    .subscribe()
-            }
         }
     }
 
@@ -212,7 +211,7 @@ class DetailViewModel(
                     it.actualStart = null
                 }
             }
-            startPlayingTimer(id)
+            timers.startPlayingTimer(id)
             playOrStopSchedule(true, id)
         }
     }
@@ -244,7 +243,7 @@ class DetailViewModel(
             return
         }
 
-        stopPlayingTimers()
+        timers.stopPlayingTimers()
         playOrStopSchedule(false)
     }
 
@@ -267,8 +266,8 @@ class DetailViewModel(
         }
     }
 
-    fun resumePlayingTimer() {
-        stopPlayingTimers()
+    fun resumePlaying() {
+        timers.stopPlayingTimers()
 
         val now = timeProvider.now()
         val step = schedule?.steps?.reversed()?.firstOrNull {
@@ -291,62 +290,11 @@ class DetailViewModel(
             val actualStart = step.actualStart
             if (actualStart != null) {
                 startStep(step.id)
-                startPlayingTimer(
+                timers.startPlayingTimer(
                     step.id,
                     Duration.ofSeconds(now.toEpochSecond() - actualStart.toEpochSecond())
                 )
             }
-        }
-    }
-
-    private val timers: MutableList<Timer> = mutableListOf()
-
-    private fun startPlayingTimer(stepId: Int, offset: Duration = Duration.ZERO) {
-        stopPlayingTimers()
-
-        val index = schedule?.steps?.indexOfFirst { it.id == stepId }
-        if (index != null && index != -1) {
-            val now = timeProvider.now()
-            val steps = schedule?.steps?.filterIndexed { i, _ -> i >= index }
-            var amount = Duration.ZERO - offset
-
-            steps?.forEachIndexed { i, step ->
-                if (i == 0) {
-                    step.actualStart = now + amount
-                    _playingStepEvents.value = Success(step.id)
-                    _settingStepTimerEvents.value = Success(Triple(step.title, step.duration, now + amount))
-                } else {
-                    step.actualStart = now + amount
-                    val timer = Timer(
-                        now + amount,
-                        schedulerProvider.computation(),
-                        schedulerProvider.ui()
-                    ) {
-                        _playingStepEvents.value = Success(step.id)
-                    }
-                    timers.add(timer)
-                    timer.start(timeProvider.now())
-                    _settingStepTimerEvents.value = Success(Triple(step.title, step.duration, now + amount))
-                }
-                amount += step.duration
-            }
-            val timer = Timer(
-                now + amount,
-                schedulerProvider.computation(),
-                schedulerProvider.ui()
-            ) {
-                playOrStopSchedule(false)
-            }
-            timers.add(timer)
-            timer.start(timeProvider.now())
-            _settingStepTimerEvents.value = Success(Triple("終了", null, now + amount))
-        }
-    }
-
-    private fun stopPlayingTimers() {
-        with(timers) {
-            forEach { it.cancel() }
-            clear()
         }
     }
 

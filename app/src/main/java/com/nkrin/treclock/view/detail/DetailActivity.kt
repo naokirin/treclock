@@ -55,7 +55,7 @@ class DetailActivity :
         setContentView(R.layout.activity_detail)
         setSupportActionBar(toolbar)
 
-        detailViewModel.scheduleId = intent?.getIntExtra("schedule_id", 0) ?: 0
+        detailViewModel.initScheduleId(intent?.getIntExtra("schedule_id", 0) ?: 0)
 
         val toolbar = toolbar as Toolbar
         setSupportActionBar(toolbar)
