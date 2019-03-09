@@ -218,7 +218,7 @@ class DetailListFragment : Fragment() {
                     return false
                 }
             })
-        adapter.itemTouchHelper = ith
+        adapter.setItemTouchHelper(ith)
         ith.attachToRecyclerView(detailList)
 
         detailList.viewTreeObserver.addOnGlobalLayoutListener (

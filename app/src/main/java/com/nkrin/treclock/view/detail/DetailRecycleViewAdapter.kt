@@ -19,9 +19,11 @@ class DetailRecycleViewAdapter(
 ) : RecyclerView.Adapter<DetailViewHolder>() {
 
     private lateinit var parent: ViewGroup
-    private var _itemTouchHelper: ItemTouchHelper? = null
-    var itemTouchHelper: ItemTouchHelper? = null
-        set(value) { _itemTouchHelper = value }
+    private var itemTouchHelper: ItemTouchHelper? = null
+
+    fun setItemTouchHelper(value: ItemTouchHelper?) {
+        itemTouchHelper = value
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DetailViewHolder {
         this.parent = parent
@@ -64,7 +66,7 @@ class DetailRecycleViewAdapter(
                 }
                 reorderIcon.setOnTouchListener { _, event ->
                     if (event.action == MotionEvent.ACTION_DOWN) {
-                        _itemTouchHelper?.startDrag(this)
+                        itemTouchHelper?.startDrag(this)
                     }
                     return@setOnTouchListener false
                 }
