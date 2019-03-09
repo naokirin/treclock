@@ -4,7 +4,6 @@ import android.arch.lifecycle.*
 import com.nkrin.treclock.domain.entity.Schedule
 import com.nkrin.treclock.domain.entity.Step
 import com.nkrin.treclock.domain.repository.ScheduleRepository
-import com.nkrin.treclock.util.Timer
 import com.nkrin.treclock.util.mvvm.*
 import com.nkrin.treclock.util.rx.SchedulerProvider
 import com.nkrin.treclock.util.rx.fromComputation
@@ -13,9 +12,7 @@ import com.nkrin.treclock.util.rx.toUi
 import com.nkrin.treclock.util.time.TimeProvider
 import io.reactivex.Completable
 import io.reactivex.Observable
-import io.reactivex.disposables.CompositeDisposable
 import org.threeten.bp.Duration
-import org.threeten.bp.OffsetDateTime
 import java.util.concurrent.TimeUnit
 
 class DetailViewModel(

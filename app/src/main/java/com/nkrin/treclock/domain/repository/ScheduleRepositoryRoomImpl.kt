@@ -1,10 +1,10 @@
 package com.nkrin.treclock.domain.repository
 
+import com.nkrin.treclock.data.room.ScheduleAndSteps
 import com.nkrin.treclock.data.room.ScheduleDao
 import com.nkrin.treclock.domain.entity.Schedule
-import io.reactivex.Single
-import com.nkrin.treclock.data.room.*
 import io.reactivex.Completable
+import io.reactivex.Single
 
 // ScheduleRepository implementation using ScheduleDao
 class ScheduleRepositoryRoomImpl(private val scheduleDao: ScheduleDao) : ScheduleRepository {

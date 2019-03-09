@@ -1,9 +1,8 @@
 package com.nkrin.treclock.data.room
 
 import android.arch.persistence.room.*
-import io.reactivex.Single
 import android.database.sqlite.SQLiteConstraintException
-
+import io.reactivex.Single
 
 
 @Dao

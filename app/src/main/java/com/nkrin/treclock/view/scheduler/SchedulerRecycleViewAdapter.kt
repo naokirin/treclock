@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import com.nkrin.treclock.R
 import com.nkrin.treclock.domain.entity.Schedule
-import com.nkrin.treclock.util.rx.SchedulerProvider
 import com.nkrin.treclock.util.time.TimeProvider
 
 

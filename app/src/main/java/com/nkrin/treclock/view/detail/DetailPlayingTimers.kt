@@ -1,6 +1,5 @@
 package com.nkrin.treclock.view.detail
 
-import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import com.nkrin.treclock.domain.entity.Schedule
 import com.nkrin.treclock.domain.repository.ScheduleRepository

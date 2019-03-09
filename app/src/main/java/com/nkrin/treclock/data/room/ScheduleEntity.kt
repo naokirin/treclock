@@ -1,6 +1,7 @@
 package com.nkrin.treclock.data.room
 
-import android.arch.persistence.room.*
+import android.arch.persistence.room.Entity
+import android.arch.persistence.room.PrimaryKey
 
 @Entity(tableName = "schedules")
 data class ScheduleEntity(

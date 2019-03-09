@@ -1,6 +1,5 @@
 package com.nkrin.treclock.view.detail
 
-import android.arch.lifecycle.MutableLiveData
 import com.nkrin.treclock.util.mvvm.BaseViewModel
 import com.nkrin.treclock.util.mvvm.SingleLiveEvent
 

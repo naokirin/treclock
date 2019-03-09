@@ -6,18 +6,14 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-
 import com.nkrin.treclock.R
 import com.nkrin.treclock.util.mvvm.Success
 import com.nkrin.treclock.util.time.TimeProvider
-import io.reactivex.Observable
-import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.fragment_detail_playing.*
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
-import java.util.concurrent.TimeUnit
 
 class DetailPlayingFragment : Fragment() {
 

@@ -8,7 +8,6 @@ import com.nkrin.treclock.view.alarm.Alarm
 import com.nkrin.treclock.view.alarm.AlarmPlayer
 import com.nkrin.treclock.view.notification.Notification
 import com.nkrin.treclock.view.notification.NotificationReceiver
-import org.koin.dsl.module.applicationContext
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.format.DateTimeFormatter
